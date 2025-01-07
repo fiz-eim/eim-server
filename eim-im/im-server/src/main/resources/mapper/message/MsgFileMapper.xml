@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgFileMapper">
+
+    <resultMap type="MsgFile" id="MsgFileResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="name" column="name"/>
+        <result property="storageType" column="storage_type"/>
+        <result property="externalId" column="external_id"/>
+        <result property="path" column="path"/>
+        <result property="thumbnailPath" column="thumbnail_path"/>
+        <result property="previewPath" column="preview_path"/>
+        <result property="extension" column="extension"/>
+        <result property="mimeType" column="mime_type"/>
+        <result property="size" column="size"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="hasPreviewImage" column="has_preview_image"/>
+        <result property="miniPreview" column="miniPreview"/>
+        <result property="hashSha256" column="hash_sha256"/>
+        <result property="hashSha1" column="hash_sha1"/>
+        <result property="hashMd5" column="hash_md5"/>
+        <result property="archived" column="archived"/>
+        <result property="deleteBy" column="delete_by"/>
+        <result property="deleteTime" column="delete_time"/>
+        <result property="extData" column="ext_data"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="uuid" column="uuid"/>
+        <result property="fileKey" column="file_key"/>
+    </resultMap>
+
+    <sql id="selectMsgFileVo">
+        select id, msg_id, channel_id, name, storage_type, external_id, path, thumbnail_path, preview_path, extension,
+               mime_type, size, width, height, has_preview_image, mini_preview, hash_sha256, hash_sha1, hash_md5, archived,
+               delete_by, delete_time, ext_data, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, uuid, concat(id, '_', case when revision is null then 0 else revision end) file_key from msg_file
+    </sql>
+
+    <select id="selectMsgFileList" parameterType="MsgFile" resultMap="MsgFileResult">
+        <include refid="selectMsgFileVo"/>
+        <where>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="storageType != null "> and storage_type = #{storageType}</if>
+            <if test="externalId != null  and externalId != ''"> and external_id = #{externalId}</if>
+            <if test="path != null  and path != ''"> and path = #{path}</if>
+            <if test="thumbnailPath != null  and thumbnailPath != ''"> and thumbnail_path = #{thumbnailPath}</if>
+            <if test="previewPath != null  and previewPath != ''"> and preview_path = #{previewPath}</if>
+            <if test="extension != null  and extension != ''"> and extension = #{extension}</if>
+            <if test="mimeType != null  and mimeType != ''"> and mime_type = #{mimeType}</if>
+            <if test="size != null "> and size = #{size}</if>
+            <if test="width != null "> and width = #{width}</if>
+            <if test="height != null "> and height = #{height}</if>
+            <if test="hasPreviewImage != null "> and has_preview_image = #{hasPreviewImage}</if>
+            <if test="miniPreview != null  and miniPreview != ''"> and mini_preview = #{miniPreview}</if>
+            <if test="hashSha256 != null  and hashSha256 != ''"> and hash_sha256 = #{hashSha256}</if>
+            <if test="hashSha1 != null  and hashSha1 != ''"> and hash_sha1 = #{hashSha1}</if>
+            <if test="hashMd5 != null  and hashMd5 != ''"> and hash_md5 = #{hashMd5}</if>
+            <if test="archived != null "> and archived = #{archived}</if>
+            <if test="deleteBy != null "> and delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and delete_time = #{deleteTime}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+            <if test="uuid != null and uuid!='' "> and uuid = #{uuid}</if>
+        </where>
+    </select>
+
+    <select id="selectMsgFileById" parameterType="Long" resultMap="MsgFileResult">
+        <include refid="selectMsgFileVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMsgFile" parameterType="MsgFile">
+        insert into msg_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="msgId != null">msg_id,</if>
+            <if test="channelId != null ">channel_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="storageType != null">storage_type,</if>
+            <if test="externalId != null and externalId != ''">external_id,</if>
+            <if test="path != null and path != ''">path,</if>
+            <if test="thumbnailPath != null and thumbnailPath != ''">thumbnail_path,</if>
+            <if test="previewPath != null and previewPath != ''">preview_path,</if>
+            <if test="extension != null and extension != ''">extension,</if>
+            <if test="mimeType != null and mimeType != ''">mime_type,</if>
+            <if test="size != null">size,</if>
+            <if test="width != null">width,</if>
+            <if test="height != null">height,</if>
+            <if test="hasPreviewImage != null">has_preview_image,</if>
+            <if test="miniPreview != null and miniPreview != ''">mini_preview,</if>
+            <if test="hashSha256 != null and hashSha256 != ''">hash_sha256,</if>
+            <if test="hashSha1 != null and hashSha1 != ''">hash_sha1,</if>
+            <if test="hashMd5 != null and hashMd5 != ''">hash_md5,</if>
+            <if test="archived != null">archived,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="extData != null and extData != ''">ext_data,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+            <if test="uuid != null and uuid!=''">uuid,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="msgId != null">#{msgId},</if>
+            <if test="channelId != null "> #{channelId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="storageType != null">#{storageType},</if>
+            <if test="externalId != null and externalId != ''">#{externalId},</if>
+            <if test="path != null and path != ''">#{path},</if>
+            <if test="thumbnailPath != null and thumbnailPath != ''">#{thumbnailPath},</if>
+            <if test="previewPath != null and previewPath != ''">#{previewPath},</if>
+            <if test="extension != null and extension != ''">#{extension},</if>
+            <if test="mimeType != null and mimeType != ''">#{mimeType},</if>
+            <if test="size != null">#{size},</if>
+            <if test="width != null">#{width},</if>
+            <if test="height != null">#{height},</if>
+            <if test="hasPreviewImage != null">#{hasPreviewImage},</if>
+            <if test="miniPreview != null and miniPreview != ''">#{miniPreview},</if>
+            <if test="hashSha256 != null and hashSha256 != ''">#{hashSha256},</if>
+            <if test="hashSha1 != null and hashSha1 != ''">#{hashSha1},</if>
+            <if test="hashMd5 != null and hashMd5 != ''">#{hashMd5},</if>
+            <if test="archived != null">#{archived},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="extData != null and extData != ''">#{extData},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="uuid != null and uuid!=''">#{uuid},</if>
+         </trim>
+    </insert>
+
+    <insert id="batchInsert" parameterType="list">
+        insert into msg_file (
+          id, msg_id, channel_id, name, storage_type, external_id, path, thumbnail_path, preview_path, extension,
+          mime_type, size, width, height, has_preview_image, mini_preview, hash_sha256, hash_sha1, hash_md5, archived,
+          delete_by, delete_time, ext_data, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, uuid
+        )
+        values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.msgId}, #{item.channelId}, #{item.name}, #{item.storageType}, #{item.externalId}, #{item.path},
+             #{item.thumbnailPath}, #{item.previewPath}, #{item.extension}, #{item.mimeType}, #{item.size}, #{item.width},
+             #{item.height}, #{item.hasPreviewImage}, #{item.miniPreview}, #{item.hashSha256},  #{item.hashSha1}, #{item.hashMd5},
+            #{item.archived}, #{item.deleteBy}, #{item.deleteTime}, #{item.extData}, #{item.remark},  #{item.tenantId},
+            #{item.revision}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime}, #{item.uuid})
+        </foreach>
+    </insert>
+
+    <update id="updateMsgFile" parameterType="MsgFile">
+        update msg_file
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="msgId != null">msg_id = #{msgId},</if>
+            <if test="channelId != null ">channel_id = #{channelId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="storageType != null">storage_type = #{storageType},</if>
+            <if test="externalId != null and externalId != ''">external_id = #{externalId},</if>
+            <if test="path != null and path != ''">path = #{path},</if>
+            <if test="thumbnailPath != null and thumbnailPath != ''">thumbnail_path = #{thumbnailPath},</if>
+            <if test="previewPath != null and previewPath != ''">preview_path = #{previewPath},</if>
+            <if test="extension != null and extension != ''">extension = #{extension},</if>
+            <if test="mimeType != null and mimeType != ''">mime_type = #{mimeType},</if>
+            <if test="size != null">size = #{size},</if>
+            <if test="width != null">width = #{width},</if>
+            <if test="height != null">height = #{height},</if>
+            <if test="hasPreviewImage != null">has_preview_image = #{hasPreviewImage},</if>
+            <if test="miniPreview != null and miniPreview != ''">mini_preview = #{miniPreview},</if>
+            <if test="hashSha256 != null and hashSha256 != ''">hash_sha256 = #{hashSha256},</if>
+            <if test="hashSha1 != null and hashSha1 != ''">hash_sha1 = #{hashSha1},</if>
+            <if test="hashMd5 != null and hashMd5 != ''">hash_md5 = #{hashMd5},</if>
+            <if test="archived != null">archived = #{archived},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="extData != null and extData != ''">ext_data=#{extData},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="uuid != null and uuid!=''">uuid = #{uuid},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMsgFileById" parameterType="Long">
+        delete from msg_file where id = #{id}
+    </delete>
+
+    <delete id="deleteMsgFileByIds" parameterType="String">
+        delete from msg_file where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

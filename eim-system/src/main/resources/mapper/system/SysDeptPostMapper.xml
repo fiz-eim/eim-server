@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.system.mapper.SysDeptPostMapper">
+
+    <resultMap type="SysDeptPost" id="SysDeptPostResult">
+        <result property="id" column="id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="postId" column="post_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectSysDeptPostVo">
+        select id, dept_id, post_id, create_by, create_time, update_by, update_time from sys_dept_post
+    </sql>
+
+    <select id="selectSysDeptPostList" parameterType="SysDeptPost" resultMap="SysDeptPostResult">
+        <include refid="selectSysDeptPostVo"/>
+        <where>
+            <if test="deptId != null  and deptId != ''"> and dept_id = #{deptId}</if>
+            <if test="postId != null  and postId != ''"> and post_id = #{postId}</if>
+            <if test="createBy != null  and createBy != ''"> and create_by = #{createBy}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="updateBy != null  and updateBy != ''"> and update_by = #{updateBy}</if>
+            <if test="updateTime != null "> and update_time = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectSysDeptPostById" parameterType="Long" resultMap="SysDeptPostResult">
+        <include refid="selectSysDeptPostVo"/>
+        where id = #{id}
+    </select>
+    <select id="getPostsByDeptIds" parameterType="java.util.List" resultType="com.soflyit.system.domain.vo.SysDeptPostVo">
+        select distinct dp.post_id postId,p.post_name postName,dp.dept_id deptId,d.dept_name deptName from sys_dept_post dp join sys_dept d on dp.dept_id = d.dept_id and d.status = '0'
+        and d.del_flag = '0' join sys_post p on dp.post_id  = p.post_id and p.status = '0'
+        <where>
+            dp.dept_id  in
+            <foreach collection="list" item="item" close=")" open="(" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+
+    <insert id="insertSysDeptPost" parameterType="SysDeptPost" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_dept_post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="postId != null">post_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="postId != null">#{postId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysDeptPost" parameterType="SysDeptPost">
+        update sys_dept_post
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="postId != null">post_id = #{postId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysDeptPostById" parameterType="Long">
+        delete from sys_dept_post where id = #{id}
+    </delete>
+
+    <delete id="deleteSysDeptPostByIds" parameterType="String">
+        delete from sys_dept_post where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByPostIdAndDeptId" parameterType="SysDeptPost">
+        delete from sys_dept_post where dept_id = #{deptId} and post_id = #{postId}
+    </delete>
+
+    <delete id="deleteSysDeptPost" parameterType="SysDeptPost">
+        delete from sys_dept_post
+        <where>
+            <if test="postId==null and deptId==null and id==null"> id = -1</if>
+            <if test="postId!=null"> and post_id = #{postId}</if>
+            <if test="deptId!=null"> and dept_id = #{deptId}</if>
+            <if test="id!=null"> and id = #{id}</if>
+        </where>
+    </delete>
+</mapper>

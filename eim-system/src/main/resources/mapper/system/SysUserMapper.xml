@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.system.mapper.SysUserMapper">
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id property="userId" column="user_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="email" column="email"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="defaultPwdFlag" column="default_pwd_flag"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deptCode" column="dept_code"/>
+        <result property="remark" column="remark"/>
+        <collection property="depts" javaType="java.util.List" resultMap="deptResult"/>
+        <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
+    </resultMap>
+
+    <resultMap type="SysUser" id="SysUserResultList">
+        <id property="userId" column="user_id"/>
+        <id property="deptId" column="ref_dept_id"/>
+        <result property="deptId" column="ref_dept_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="email" column="email"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="defaultPwdFlag" column="default_pwd_flag"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <result property="deptCode" column="dept_code"/>
+        <association property="dept" column="ref_dept_id" resultMap="deptResult"/>
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id property="deptId" column="ref_dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptCode" column="dept_code"/>
+        <result property="tanentCode" column="tanent_code"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="leader" column="leader"/>
+        <result property="status" column="dept_status"/>
+    </resultMap>
+
+    <resultMap id="RoleResult" type="SysRole">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleKey" column="role_key"/>
+        <result property="roleSort" column="role_sort"/>
+        <result property="dataScope" column="data_scope"/>
+        <result property="status" column="role_status"/>
+    </resultMap>
+
+    <resultMap id="postResult" type="SysPost">
+        <id property="postId" column="post_id"/>
+        <result property="postName" column="post_name"/>
+        <result property="postSort" column="post_sort"/>
+        <result property="postCode" column="post_code"/>
+        <result property="status" column="post_status"/>
+    </resultMap>
+
+    <!-- 查询默认部门关联角色模型   -->
+    <sql id="selectUserVo">
+        select u.user_id,
+               u.dept_id,
+               u.user_name,
+               u.nick_name,
+               u.email,
+               u.avatar,
+               u.phonenumber,
+               u.password,
+               u.sex,
+               u.status,
+               u.del_flag,
+               u.default_pwd_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.create_time,
+               u.remark,
+               d.dept_id ref_dept_id,
+               d.parent_id,
+               d.dept_name,
+               d.dept_code,
+               d.tanent_code,
+               d.order_num,
+               d.leader,
+               d.status as dept_status,
+               r.role_id,
+               r.role_name,
+               r.role_key,
+               r.role_sort,
+               r.data_scope,
+               r.status as role_status
+        from sys_user u
+                 left join sys_dept_user sdu on u.user_id = sdu.user_id
+                 left join sys_dept d on  d.STATUS = 0  AND d.del_flag = '0' and d.dept_id = sdu.dept_id
+                 left join sys_user_post sup on sup.user_id = u.user_id and sup.dept_id = d.dept_id
+                 left join sys_post_role spr on spr.post_id = sup.post_id
+                 left join sys_role r on r.role_id = spr.role_id
+    </sql>
+
+    <select id="selectUserListByIds" resultMap="SysUserResult">
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+        u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark from
+        sys_user u
+        where u.del_flag = '0' and user_id in
+        <foreach collection="array" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+
+    <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult" databaseId="sqlserver">
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+        u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark from
+        sys_user u
+        where u.del_flag = '0'
+        <if test="userId != null">
+            AND u.user_id = #{userId}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND (u.user_name like concat('%', #{userName}, '%') or u.nick_name like concat('%', #{userName}, '%'))
+        </if>
+        <if test="nickName != null and nickName != ''">
+            AND u.nick_name like concat('%', #{nickName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND u.status = #{status}
+        </if>
+        <if test="phonenumber != null and phonenumber != ''">
+            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND u.create_time &gt;= #{params.beginTime}
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND u.create_time &lt;= #{params.endTime}
+        </if>
+        <if test="deptId != null and deptId != 0">
+            AND user_id in (select user_id from sys_dept_user sdu
+            where sdu.dept_id = #{deptId}
+            or sdu.dept_id in
+            (SELECT t.dept_id FROM sys_dept t WHERE charindex(concat(',', #{deptId}, ','), concat(',', ancestors, ','))
+            > 0))
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult" databaseId="mysql">
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+        u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark from
+        sys_user u
+        where u.del_flag = '0'
+        <if test="userId != null">
+            AND u.user_id = #{userId}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND (u.user_name like concat('%', #{userName}, '%') or u.nick_name like concat('%', #{userName}, '%'))
+        </if>
+        <if test="nickName != null and nickName != ''">
+            AND u.nick_name like concat('%', #{nickName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND u.status = #{status}
+        </if>
+        <if test="phonenumber != null and phonenumber != ''">
+            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND u.create_time &gt;= #{params.beginTime}
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND u.create_time &lt;= #{params.endTime}
+        </if>
+        <if test="deptId != null and deptId != 0">
+            AND user_id in (select user_id from sys_dept_user sdu
+            where sdu.dept_id = #{deptId}
+            or sdu.dept_id in
+            (SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors)))
+        </if>
+        <if test="deptIds != null">
+            and u.dept_id in
+            <foreach item="deptId" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="postId != null and postId != 0">
+            and u.user_id in( select user_id from sys_user_post sup where post_id = #{postId})
+        </if>
+
+        <if test="postIds != null">
+            and u.user_id in(
+            select user_id from sys_user_post sup where post_id in
+            <foreach item="postId" index="index" collection="postIds" open="(" separator="," close=")">
+                #{postId}
+            </foreach>
+            )
+        </if>
+        <if test="sex != null and sex != ''">
+            and u.sex = #{sex}
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <select id="selectUserListByUserId" parameterType="SysUser" resultMap="deptResult">
+        select d.dept_code, d.dept_id ref_dept_id,d.dept_name, d.leader ,d.tanent_code
+        from sys_dept_user sdu
+        left join sys_user u on sdu.user_id = u.user_id
+        left join sys_dept d on d.dept_id = sdu.dept_id
+        where u.user_id = #{userId} and d.status = '0' and d.del_flag = '0'
+    </select>
+
+    <select id="selectPostListByUserId" parameterType="SysUser" resultMap="postResult">
+        select p.post_id, p.post_name, p.post_code, p.post_sort, p.status as post_status
+        from sys_post p
+        left join sys_user_post sup on sup.post_id = p.post_id
+        left join sys_user u on u.user_id = sup.user_id
+        where u.user_id = #{userId} and p.status = '0'
+    </select>
+
+    <select id="selectUser" parameterType="SysUser" resultMap="SysUserResult">
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+        u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from
+        sys_user u
+        left join sys_dept d on u.dept_id = d.dept_id
+        where u.del_flag = '0'
+        <if test="userName != null and userName != ''">
+            AND u.user_name = #{userName}
+        </if>
+        <if test="userId != null and userId != ''">
+            AND u.user_id = #{userId}
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <select id="selectAllocatedList" parameterType="SysUser" resultMap="SysUserResult">
+        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status, u.create_time
+        from sys_user u
+        left join sys_dept d on u.dept_id = d.dept_id
+        left join sys_user_post sup on sup.user_id=u.user_id
+        left join sys_post_role spr on spr.post_id=sup.post_id
+        left join sys_role r on r.role_id = spr.role_id
+        where u.del_flag = '0' and r.role_id = #{roleId}
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="phonenumber != null and phonenumber != ''">
+            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <select id="selectUnallocatedList" parameterType="SysUser" resultMap="SysUserResult">
+        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status, u.create_time
+        from sys_user u
+        left join sys_dept d on u.dept_id = d.dept_id
+        left join sys_user_post sup on sup.user_id=u.user_id
+        left join sys_post_role spr on spr.post_id=sup.post_id
+        left join sys_role r on r.role_id = spr.role_id
+        where u.del_flag = '0' and (r.role_id != #{roleId} or r.role_id IS NULL)
+        and u.user_id not in (select u.user_id from sys_user u inner join sys_user_post sup on sup.user_id=u.user_id
+        inner join sys_post_role spr on spr.post_id=sup.post_id and spr.role_id = #{roleId})
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="phonenumber != null and phonenumber != ''">
+            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <select id="selectUserByUserName" parameterType="SysUser" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        <if test="params.appId!=null">
+            and r.app_id=#{params.appId}
+        </if>
+        where u.user_name = #{userName} and u.del_flag != 2
+    </select>
+
+    <select id="selectUserByUserPhone" parameterType="SysUser" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        <if test="params.appId!=null">
+            and r.app_id=#{params.appId}
+        </if>
+        where u.phonenumber = #{phonenumber} and u.del_flag != 2
+    </select>
+
+    <select id="selectUserById" parameterType="SysUser" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        <if test="params.appId!=null">
+            and r.app_id=#{params.appId}
+        </if>
+        where u.user_id = #{userId}
+    </select>
+
+    <select id="checkUserNameUnique" parameterType="String" resultType="int">
+        select count(1)
+        from sys_user
+        where user_name = #{userName}
+          and del_flag != 2
+    </select>
+
+    <select id="checkPhoneUnique" parameterType="String" resultMap="SysUserResult">
+        select user_id, phonenumber
+        from sys_user
+        where phonenumber = #{phonenumber}
+          and del_flag != 2
+    </select>
+
+    <select id="checkEmailUnique" parameterType="String" resultMap="SysUserResult">
+        select user_id, email
+        from sys_user
+        where email = #{email}
+          and del_flag != 2
+    </select>
+
+    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId" databaseId="mysql">
+        insert into sys_user(
+        <if test="userId != null and userId != 0">user_id,</if>
+        <if test="deptId != null and deptId != 0">dept_id,</if>
+        <if test="userName != null and userName != ''">user_name,</if>
+        <if test="nickName != null and nickName != ''">nick_name,</if>
+        <if test="email != null and email != ''">email,</if>
+        <if test="avatar != null and avatar != ''">avatar,</if>
+        <if test="phonenumber != null and phonenumber != ''">phonenumber,</if>
+        <if test="sex != null and sex != ''">sex,</if>
+        <if test="password != null and password != ''">password,</if>
+        <if test="status != null and status != ''">status,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        create_time
+        )values(
+        <if test="userId != null and userId != ''">#{userId},</if>
+        <if test="deptId != null and deptId != ''">#{deptId},</if>
+        <if test="userName != null and userName != ''">#{userName},</if>
+        <if test="nickName != null and nickName != ''">#{nickName},</if>
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="avatar != null and avatar != ''">#{avatar},</if>
+        <if test="phonenumber != null and phonenumber != ''">#{phonenumber},</if>
+        <if test="sex != null and sex != ''">#{sex},</if>
+        <if test="password != null and password != ''">#{password},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        sysdate()
+        )
+    </insert>
+
+    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId" databaseId="sqlserver">
+        insert into sys_user(
+        <if test="userId != null and userId != 0">user_id,</if>
+        <if test="deptId != null and deptId != 0">dept_id,</if>
+        <if test="userName != null and userName != ''">user_name,</if>
+        <if test="nickName != null and nickName != ''">nick_name,</if>
+        <if test="email != null and email != ''">email,</if>
+        <if test="avatar != null and avatar != ''">avatar,</if>
+        <if test="phonenumber != null and phonenumber != ''">phonenumber,</if>
+        <if test="sex != null and sex != ''">sex,</if>
+        <if test="password != null and password != ''">password,</if>
+        <if test="status != null and status != ''">status,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        create_time
+        )values(
+        <if test="userId != null and userId != ''">#{userId},</if>
+        <if test="deptId != null and deptId != ''">#{deptId},</if>
+        <if test="userName != null and userName != ''">#{userName},</if>
+        <if test="nickName != null and nickName != ''">#{nickName},</if>
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="avatar != null and avatar != ''">#{avatar},</if>
+        <if test="phonenumber != null and phonenumber != ''">#{phonenumber},</if>
+        <if test="sex != null and sex != ''">#{sex},</if>
+        <if test="password != null and password != ''">#{password},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        getdate()
+        )
+    </insert>
+
+    <update id="updateUser" parameterType="SysUser" databaseId="mysql">
+        update sys_user
+        <set>
+            <if test="deptId != null and deptId != 0">dept_id = #{deptId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="email != null ">email = #{email},</if>
+            <if test="phonenumber != null ">phonenumber = #{phonenumber},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="defaultPwdFlag != null">default_pwd_flag = #{defaultPwdFlag},</if>
+            <if test="loginIp != null and loginIp != ''">login_ip = #{loginIp},</if>
+            <if test="loginDate != null">login_date = #{loginDate},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <update id="updateUser" parameterType="SysUser" databaseId="sqlserver">
+        update sys_user
+        <set>
+            <if test="deptId != null and deptId != 0">dept_id = #{deptId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="email != null ">email = #{email},</if>
+            <if test="phonenumber != null ">phonenumber = #{phonenumber},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="loginIp != null and loginIp != ''">login_ip = #{loginIp},</if>
+            <if test="loginDate != null">login_date = #{loginDate},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = getdate()
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <update id="updateUserStatus" parameterType="SysUser">
+        update sys_user
+        set status = #{status}
+        where user_id = #{userId}
+    </update>
+
+    <update id="updateUserAvatar" parameterType="SysUser">
+        update sys_user
+        set avatar = #{avatar}
+        where user_name = #{userName}
+    </update>
+
+    <delete id="deleteUserById" parameterType="Long">
+        update sys_user
+        set del_flag = '2'
+        where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUserByIds" parameterType="Long">
+        update sys_user set del_flag = '2' where user_id in
+        <foreach collection="array" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+    <select id="selectUserByDeptId" parameterType="Long" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        where u.dept_id = #{deptId}
+    </select>
+
+    <select id="getUserByDeptId" parameterType="Long" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        where u.dept_id = #{deptId} and u.del_flag != 2 and u.status='0'
+    </select>
+
+    <select id="selectUserListByPostId" parameterType="SysUser" resultMap="SysUserResultList">
+        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status,
+        u.create_time,d.dept_name,d.dept_id ref_dept_id
+        from
+        sys_user u
+        left join sys_user_post sup on sup.user_id = u.user_id
+        left join sys_dept d on d.dept_id = sup.dept_id
+        where sup.post_id = #{postId}
+        <if test="nickName!=null and nickName!=''">
+            and u.nick_name like concat('%', #{nickName}, '%')
+        </if>
+        <if test="phonenumber!=null and phonenumber!=''">
+            and u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        <if test="deptId!=null and deptId >0 ">
+            and u.dept_id = #{deptId}
+        </if>
+
+    </select>
+    <select id="selectUnSelectUser" parameterType="SysUser" resultMap="SysUserResultList">
+        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status,
+        u.create_time,sdu.dept_id ref_dept_id,d.dept_name
+        from
+        sys_user u
+        left join sys_dept_user sdu on sdu.user_id = u.user_id
+        left join sys_dept d on sdu.dept_id = d.dept_id
+        where sdu.dept_id in (select dept_id from sys_dept_post where post_id = #{postId})
+        and u.status = '0' and u.del_flag != 2
+        and (u.user_id not in (select user_id from sys_user_post sup where post_id = #{postId}) or
+        sdu.dept_id not in (select dept_id from sys_user_post sup where post_id = #{postId}))
+        <if test="nickName!=null and nickName!=''">
+            and u.nick_name like concat('%', #{nickName}, '%')
+        </if>
+        <if test="phonenumber!=null and phonenumber!=''">
+            and u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        ${params.dataScope}
+    </select>
+
+    <select id="getNickNameById" parameterType="Long" resultMap="SysUserResult">
+        select user_id,nick_name
+        from sys_user
+        <where>
+            user_id = #{userId}
+        </where>
+    </select>
+
+    <select id="getUserInfoByUserNames" parameterType="java.util.List" resultMap="SysUserResult">
+        select
+        u.user_id,
+        u.dept_id,
+        u.user_name,
+        u.nick_name,
+        u.email,
+        u.avatar,
+        u.phonenumber,
+        u.sex,
+        u.status,
+        u.del_flag,
+        u.login_ip,
+        u.login_date,
+        u.create_by,
+        u.create_time,
+        u.remark
+        from sys_user u
+        where
+        u.del_flag = 0 and
+        u.user_name in
+        <foreach collection="userNames" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getUserInfoByIds" parameterType="java.util.List" resultMap="SysUserResult">
+        select
+        u.dept_id,
+        u.user_id,
+        u.user_name,
+        u.nick_name,
+        u.email,
+        u.avatar,
+        u.phonenumber,
+        u.sex,
+        u.status,
+        u.del_flag,
+        u.login_ip,
+        u.login_date,
+        u.create_by,
+        u.create_time,
+        u.remark
+        from sys_user u
+        where
+        u.del_flag = 0 and
+        u.user_id in
+        <foreach collection="userIds" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getUserInfoByExt1" resultMap="SysUserResult">
+        select
+            u.dept_id,
+            u.user_id,
+            u.user_name,
+            u.nick_name,
+            u.email,
+            u.avatar,
+            u.phonenumber,
+            u.sex,
+            u.status,
+            u.del_flag,
+            u.login_ip,
+            u.login_date,
+            u.create_by,
+            u.create_time,
+            u.remark
+        from sys_user u
+        where u.del_flag = 0
+          and u.ext1 = #{ext1}
+    </select>
+
+    <select id="selectInfoByPhonenumber" parameterType="java.lang.String" resultMap="SysUserResult">
+        select u.dept_id,
+               u.user_id,
+               u.user_name,
+               u.nick_name,
+               u.phonenumber
+        from sys_user u
+        where u.del_flag = 0
+          and u.phonenumber = #{phonenumber}
+    </select>
+
+    <select id="selectUserByNickName" parameterType="java.lang.String"
+            resultType="com.soflyit.system.api.domain.vo.SysUserSimpleVO">
+    select user_id userId,dept_id deptId,user_name userName, nick_name nickName from sys_user where nick_name like concat('%', #{nickName}, '%')
+    </select>
+    <select id="getAllSimpleUserList" resultType="com.soflyit.system.api.domain.vo.SysUserSimpleVO">
+    select user_id userId,dept_id deptId,user_name userName, nick_name nickName from sys_user
+    </select>
+
+
+    <select id="getByUserId" parameterType="Long" resultMap="SysUserResult">
+        SELECT
+        user_id,
+        nick_name,
+        dept_name,
+        user_name
+        FROM
+        sys_user u
+        LEFT JOIN sys_dept d
+        ON d.dept_id = u.dept_id
+        <where>
+            user_id = #{userId}
+        </where>
+        limit 1
+    </select>
+
+    <update id="lockByUserName" parameterType="String">
+        update sys_user
+        set status = 1
+        where user_name = #{userName}
+    </update>
+
+    <select id="selectUserListByAttribIds" resultMap="SysUserResult">
+        SELECT DISTINCT
+           u.dept_id,
+           u.user_id,
+           u.user_name,
+           u.nick_name,
+           u.phonenumber
+        FROM sys_user u
+        <if test="attribType == 'role'">
+            LEFT JOIN sys_user_role ur ON ur.user_id = u.user_id
+            WHERE u.status = '0'
+            AND u.del_flag = '0'
+            AND ur.role_id in
+            <foreach collection="firstAttribIds" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="attribType == 'post'">
+            LEFT JOIN sys_user_post up ON up.user_id = u.user_id
+            WHERE u.status = '0'
+            AND u.del_flag = '0'
+            AND up.post_id in
+            <foreach collection="firstAttribIds" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="attribType == 'dept'">
+            LEFT JOIN sys_dept_user sdu ON sdu.user_id = u.user_id
+            WHERE u.status = '0'
+            AND u.del_flag = '0'
+            AND (
+                sdu.dept_id IN
+                <foreach collection="firstAttribIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            OR sdu.dept_id IN (
+            SELECT t.dept_id FROM sys_dept t WHERE 1 = 1 AND
+                <foreach collection="firstAttribIds" item="item" index="" open="(" separator="OR" close=")">
+                    find_in_set(#{item}, ancestors)
+                </foreach>
+            ))
+        </if>
+        <if test="attribType == 'deptAndPost'">
+            LEFT JOIN sys_dept_user sdu ON sdu.user_id = u.user_id
+            LEFT JOIN sys_user_post up ON up.user_id = u.user_id
+            WHERE u.status = '0'
+            AND u.del_flag = '0'
+            AND up.dept_id IN
+            <foreach collection="firstAttribIds" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            AND up.post_id IN
+            <foreach collection="secAttribIds" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="getNickNames" parameterType="list" resultMap="SysUserResult">
+        SELECT
+        user_id,
+        nick_name,
+        dept_name,
+        user_name
+        FROM
+        sys_user u
+        LEFT JOIN sys_dept d ON d.dept_id = u.dept_id
+        <where>
+            <if test="list!=null and list.size()>0">
+                user_id in <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+        </where>
+
+    </select>
+</mapper>

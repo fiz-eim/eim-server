@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.soflyit.cloud.open</groupId>
+        <artifactId>eim-common</artifactId>
+        <version>${eim-cloud.version}${eim-cloud.changelist}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>eim-common-security</artifactId>
+
+    <description>
+        eim-common-security安全模块
+    </description>
+
+    <dependencies>
+
+        <!-- Spring Web -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <!-- Industry Api System -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-system-api</artifactId>
+        </dependency>
+
+        <!-- Industry Common Redis-->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-core</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

@@ -1,0 +1,42 @@
+# Build and Release Folders
+bin-debug/
+bin-release/
+[Oo]bj/
+[Bb]in/
+
+# Other files and folders
+.settings/
+
+# Executables
+*.swf
+*.air
+*.ipa
+*.apk
+
+target
+.idea
+*.iml
+logs/
+eim-dist.tar.gz
+
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
+.flattened-pom.xml
+
+/eim-build/src/config/nginx/front/im-ui/css
+/eim-build/src/config/nginx/front/im-ui/img
+/eim-build/src/config/nginx/front/im-ui/js
+/eim-build/src/config/nginx/front/im-ui/fonts
+/eim-build/src/config/nginx/front/im-ui/media
+/eim-build/src/config/nginx/front/im-ui/favicon.ico
+/eim-build/src/config/nginx/front/im-ui/index.html
+
+/eim-build/src/config/nginx/front/manager-ui/css
+/eim-build/src/config/nginx/front/manager-ui/img
+/eim-build/src/config/nginx/front/manager-ui/js
+/eim-build/src/config/nginx/front/manager-ui/fonts
+/eim-build/src/config/nginx/front/im-ui/index.html
+/eim-build/src/config/nginx/front/manager-ui/favicon.ico
+/eim-build/src/config/nginx/front/manager-ui/index.html
+/eim-build/src/config/nginx/front/manager-ui/index.html.gz

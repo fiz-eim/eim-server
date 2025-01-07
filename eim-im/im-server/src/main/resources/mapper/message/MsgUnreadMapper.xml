@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgUnreadMapper">
+
+    <resultMap type="MsgUnread" id="MsgUnreadResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="readTime" column="read_time"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectMsgUnreadVo">
+        select id, msg_id, user_id, read_time, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, channel_id from msg_unread
+    </sql>
+
+    <select id="selectMsgUnreadList" parameterType="MsgUnread" resultMap="MsgUnreadResult">
+        <include refid="selectMsgUnreadVo"/>
+        <where>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="readTime != null "> and read_time = #{readTime}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+
+    <select id="selectMentionMessageIds" resultMap="MsgUnreadResult" parameterType="com.soflyit.chattask.im.message.domain.param.MessageMentionQueryParam">
+        SELECT
+            t1.msg_id,t1.read_time
+        FROM
+            msg_ack t
+        JOIN msg_unread t1 ON t.msg_id = t1.msg_id  and t.user_id=t1.user_id
+        where t1.channel_id=#{channelId} and t1.user_id=#{userId}
+    </select>
+
+    <select id="selectUnreadTopicMsg" resultMap="MsgUnreadResult" parameterType="MsgUnread">
+        SELECT
+            id, msg_id, user_id, read_time, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, channel_id
+        FROM
+            msg_unread t
+        WHERE
+        t.channel_id in <foreach collection="params.channelIds" open="(" item="item" separator="," close=")" index="idx"> #{item}</foreach>
+          AND t.msg_id IN ( SELECT id FROM message WHERE root_id IN
+            <foreach collection="params.rootIds" open="(" item="item" separator="," close=")" index="idx">
+                #{item}
+            </foreach>)
+          AND user_id = #{userId} and read_time is null
+    </select>
+
+    <select id="selectMsgUnreadById" parameterType="Long" resultMap="MsgUnreadResult">
+        <include refid="selectMsgUnreadVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMsgUnread" parameterType="MsgUnread" useGeneratedKeys="true" keyProperty="id">
+        insert into msg_unread
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="msgId != null">msg_id,</if>
+            <if test="channelId != null "> channel_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="readTime != null">read_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="msgId != null">#{msgId},</if>
+            <if test="channelId != null ">#{channelId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="readTime != null">#{readTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+    <insert id="batchInsert" parameterType="list">
+        insert into msg_unread (
+            id,
+            msg_id,
+            channel_id,
+            user_id,
+            remark,
+            TENANT_ID,
+            REVISION,
+            CREATE_BY,
+            CREATE_TIME,
+            UPDATE_BY,
+            UPDATE_TIME
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id},
+            #{item.msgId},
+            #{item.channelId},
+            #{item.userId},
+            #{item.remark},
+            #{item.tenantId},
+            #{item.revision},
+            #{item.createBy},
+            #{item.createTime},
+            #{item.updateBy},
+            #{item.updateTime})
+        </foreach>
+    </insert>
+
+    <update id="updateMsgUnread" parameterType="MsgUnread">
+        update msg_unread
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="msgId != null">msg_id = #{msgId},</if>
+            <if test="channelId != null ">channel_id = #{channelId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="readTime != null">read_time = #{readTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMsgUnreadById" parameterType="Long">
+        delete from msg_unread where id = #{id}
+    </delete>
+
+    <delete id="deleteMsgUnreadByIds" parameterType="String">
+        delete from msg_unread where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

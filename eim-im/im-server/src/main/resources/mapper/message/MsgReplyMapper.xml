@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgReplyMapper">
+
+    <resultMap type="MsgReply" id="MsgReplyResult">
+        <result property="id" column="id"/>
+        <result property="replyCount" column="reply_count"/>
+        <result property="lastReplyTime" column="last_reply_time"/>
+        <result property="participants" column="participants"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="deleteBy" column="delete_by"/>
+        <result property="threadDeleteTime" column="thread_delete_time"/>
+        <result property="extData" column="ext_data"/>
+    </resultMap>
+
+    <sql id="selectMsgReplyVo">
+        select id, reply_count, last_reply_time, participants, channel_id, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, delete_by, thread_delete_time, ext_data from msg_reply
+    </sql>
+
+    <select id="selectMsgReplyList" parameterType="MsgReply" resultMap="MsgReplyResult">
+        <include refid="selectMsgReplyVo"/>
+        <where>
+            <if test="replyCount != null "> and reply_count = #{replyCount}</if>
+            <if test="lastReplyTime != null "> and last_reply_time = #{lastReplyTime}</if>
+            <if test="participants != null  and participants != ''"> and participants = #{participants}</if>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+            <if test="deleteBy != null "> and delete_by = #{deleteBy}</if>
+            <if test="threadDeleteTime != null "> and thread_delete_time = #{threadDeleteTime}</if>
+        </where>
+    </select>
+
+    <select id="selectMsgReplyById" parameterType="Long" resultMap="MsgReplyResult">
+        <include refid="selectMsgReplyVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMsgReply" parameterType="MsgReply">
+        insert into msg_reply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="replyCount != null">reply_count,</if>
+            <if test="lastReplyTime != null">last_reply_time,</if>
+            <if test="participants != null and participants != ''">participants,</if>
+            <if test="channelId != null">channel_id,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="threadDeleteTime != null">thread_delete_time,</if>
+            <if test="extData != null">ext_data,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="replyCount != null">#{replyCount},</if>
+            <if test="lastReplyTime != null">#{lastReplyTime},</if>
+            <if test="participants != null and participants != ''">#{participants},</if>
+            <if test="channelId != null">#{channelId},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="threadDeleteTime != null">#{threadDeleteTime},</if>
+            <if test="extData != null">#{extData},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMsgReply" parameterType="MsgReply">
+        update msg_reply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="replyCount != null">reply_count = #{replyCount},</if>
+            <if test="lastReplyTime != null">last_reply_time = #{lastReplyTime},</if>
+            <if test="participants != null and participants != ''">participants = #{participants},</if>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="threadDeleteTime != null">thread_delete_time = #{threadDeleteTime},</if>
+            <if test="extData != null">ext_data = #{extData},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMsgReplyById" parameterType="Long">
+        delete from msg_reply where id = #{id}
+    </delete>
+
+    <delete id="deleteMsgReplyByIds" parameterType="String">
+        delete from msg_reply where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

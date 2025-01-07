@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+    com.soflyit.common.datasource.env.ApplicationSeataInitializer

@@ -1,0 +1,12 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.soflyit.common.security.config.WebMvcConfig,\
+  com.soflyit.common.security.service.TokenService,\
+  com.soflyit.common.security.aspect.PreAuthorizeAspect,\
+  com.soflyit.common.security.aspect.InnerAuthAspect,\
+  com.soflyit.common.security.handler.GlobalExceptionHandler, \
+  com.soflyit.common.security.handler.MyMetaObjectHandler,\
+  com.soflyit.common.security.feign.FeignAutoConfiguration, \
+  com.soflyit.common.security.config.JacksonConfig, \
+  com.soflyit.common.security.config.MybatisPlusConfig, \
+  com.soflyit.common.security.config.FileUploadConfig
+

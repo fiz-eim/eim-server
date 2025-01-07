@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MessageMapper">
+
+    <resultMap type="Message" id="MessageResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="rootId" column="root_id"/>
+        <result property="originalId" column="original_id"/>
+        <result property="content" column="content"/>
+        <result property="type" column="type"/>
+        <result property="propsStr" column="props"/>
+        <result property="msgFiles" column="files"/>
+        <result property="hasReactions" column="has_reactions"/>
+        <result property="editTime" column="edit_time"/>
+        <result property="priority" column="priority"/>
+        <result property="requestedAck" column="requested_ack"/>
+        <result property="persistentNotification" column="persistent_notification"/>
+        <result property="mentionUsers" column="mention_users"/>
+        <result property="msgExtData" column="msg_ext_data"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="deleteBy" column="delete_by"/>
+        <result property="deleteTime" column="delete_time"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectMessageVo">
+        select id, user_id, channel_id, root_id, original_id, content, type, props, files, has_reactions, edit_time,
+            priority, requested_ack, persistent_notification, mention_users, msg_ext_data, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, delete_by, delete_time, UPDATE_TIME from message
+    </sql>
+
+    <select id="selectMessageList" parameterType="Message" resultMap="MessageResult">
+        <include refid="selectMessageVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="rootId != null "> and root_id = #{rootId}</if>
+            <if test="originalId != null "> and original_id = #{originalId}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="propsStr != null  and propsStr != ''"> and props = #{propsStr}</if>
+            <if test="msgFiles != null  and msgFiles != ''"> and files = #{msgFiles}</if>
+            <if test="hasReactions != null "> and has_reactions = #{hasReactions}</if>
+            <if test="editTime != null "> and edit_time = #{editTime}</if>
+            <if test="priority != null "> and priority = #{priority}</if>
+            <if test="requestedAck != null "> and requested_ack = #{requestedAck}</if>
+            <if test="persistentNotification != null "> and persistent_notification = #{persistentNotification}</if>
+            <if test="mentionUsers != null  and mentionUsers != ''"> and mention_users = #{mentionUsers}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="deleteBy != null "> and delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and delete_time = #{deleteTime}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectMessageById" parameterType="Long" resultMap="MessageResult">
+        <include refid="selectMessageVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectMessageListByParam" resultMap="MessageResult" parameterType="com.soflyit.chattask.im.message.domain.param.MessageQueryParam">
+        select id, user_id, channel_id, root_id, original_id, content, type, props, files, has_reactions, edit_time, priority,
+          requested_ack, persistent_notification, mention_users, msg_ext_data, remark, CREATE_BY, CREATE_TIME,
+          UPDATE_BY, delete_by, delete_time, UPDATE_TIME
+          from message
+        <where>
+            <if test="channelId!=null">
+                channel_id = #{channelId}
+            </if>
+            <if test="channelId==null and channelIds!=null and channelIds.size()>0">
+                and channel_id in <foreach collection="channelIds" item="item" open="(" close=")" separator=","> #{item}</foreach>
+            </if>
+            <if test="since != null "> and CREATE_TIME &gt;= #{since}</if>
+            <if test="endTime != null "> and CREATE_TIME &lt;= #{endTime}</if>
+            <if test="msgIdBefore != null ">
+                <if test="excludeNextMsg==null or !excludeNextMsg">
+                    and id &lt;= #{msgIdBefore}
+                </if>
+                <if test="excludeNextMsg!=null and excludeNextMsg==true">
+                    and id &lt; #{msgIdBefore}
+                </if>
+            </if>
+            <if test="msgIdAfter != null ">
+                <if test="excludeNextMsg==null or !excludeNextMsg">
+                    and id >= #{msgIdAfter}
+                </if>
+                <if test="excludeNextMsg!=null and excludeNextMsg==true">
+                    and id > #{msgIdAfter}
+                </if>
+            </if>
+            <if test="includeDeleted == null  || !includeDeleted"> and delete_time = -1</if>
+            <if test="queryReplyMessage == null  || !queryReplyMessage"> and root_id is null</if>
+            <if test="content!=null and content!=''" > and content like concat('%', #{content}, '%')</if>
+            <if test="exceptMsgIds!=null and exceptMsgIds.size()>0">
+                and id not in <foreach collection="exceptMsgIds" open="(" close=")" separator="," item="item">#{item}</foreach>
+            </if>
+        </where>
+        order by id<if test="fetchBefore!=null and fetchBefore==true"> desc </if>
+    </select>
+
+    <select id="selectUserMessageListByParam" resultMap="MessageResult" parameterType="com.soflyit.chattask.im.message.domain.param.UserMessageQueryParam">
+        select id, user_id, channel_id, root_id, original_id, content, type, props, files, has_reactions, edit_time, priority,
+          requested_ack, persistent_notification, mention_users, msg_ext_data, remark, CREATE_BY, CREATE_TIME,
+          UPDATE_BY, delete_by, delete_time, UPDATE_TIME
+          from message
+        <where>
+            channel_id = #{channelId}
+            <if test="createTime != null ">
+                <if test="params.queryType == 'before' and createTime!=null">
+                    and CREATE_TIME &lt;= #{createTime}
+                </if>
+                <if test="params.queryType == 'after' and createTime!=null">
+                    and CREATE_TIME &gt; #{createTime}
+                </if>
+            </if>
+            <if test="(skipFetchThreads!=null and skipFetchThreads) || (collapsedThreads!=null and collapsedThreads)">
+                root_id is nulll
+            </if>
+
+
+        </where>
+    </select>
+
+    <insert id="insertMessage" parameterType="Message" useGeneratedKeys="true" keyProperty="id">
+        insert into message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="channelId != null">channel_id,</if>
+            <if test="rootId != null">root_id,</if>
+            <if test="originalId != null">original_id,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="type != null">type,</if>
+            <if test="propsStr != null and propsStr != ''">props,</if>
+            <if test="msgFiles != null and msgFiles != ''">files,</if>
+            <if test="hasReactions != null">has_reactions,</if>
+            <if test="editTime != null">edit_time,</if>
+            <if test="priority != null">priority,</if>
+            <if test="requestedAck != null">requested_ack,</if>
+            <if test="persistentNotification != null">persistent_notification,</if>
+            <if test="mentionUsers != null and mentionUsers != ''">mention_users,</if>
+            <if test="msgExtData != null and msgExtData != ''">msg_ext_data,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="channelId != null">#{channelId},</if>
+            <if test="rootId != null">#{rootId},</if>
+            <if test="originalId != null">#{originalId},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="type != null">#{type},</if>
+            <if test="propsStr != null and propsStr != ''">#{propsStr},</if>
+            <if test="msgFiles != null and msgFiles != ''">#{msgFiles},</if>
+            <if test="hasReactions != null">#{hasReactions},</if>
+            <if test="editTime != null">#{editTime},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="requestedAck != null">#{requestedAck},</if>
+            <if test="persistentNotification != null">#{persistentNotification},</if>
+            <if test="mentionUsers != null and mentionUsers != ''">#{mentionUsers},</if>
+            <if test="msgExtData != null and msgExtData != ''">#{msgExtData},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMessage" parameterType="Message">
+        update message
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="rootId != null">root_id = #{rootId},</if>
+            <if test="originalId != null">original_id = #{originalId},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="propsStr != null and propsStr != ''">props = #{propsStr},</if>
+            <if test="msgFiles != null and msgFiles != ''">files = #{msgFiles},</if>
+            <if test="hasReactions != null">has_reactions = #{hasReactions},</if>
+            <if test="editTime != null">edit_time = #{editTime},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="requestedAck != null">requested_ack = #{requestedAck},</if>
+            <if test="persistentNotification != null">persistent_notification = #{persistentNotification},</if>
+            <if test="mentionUsers != null and mentionUsers != ''">mention_users = #{mentionUsers},</if>
+            <if test="msgExtData != null and msgExtData != ''">msg_ext_data=#{msgExtData},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMessageById" parameterType="Long">
+        delete from message where id = #{id}
+    </delete>
+
+    <delete id="deleteMessageByIds" parameterType="String">
+        delete from message where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

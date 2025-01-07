@@ -1,0 +1,45 @@
+soflyit:
+  nacos:
+    username: nacos
+    password: nacos
+    config:
+      server: 172.20.1.13:8848
+      namespace: eim-platform
+      group: dev
+    discovery:
+      server: ${soflyit.nacos.config.server}
+      namespace: ${soflyit.nacos.config.namespace}
+      group: ${soflyit.nacos.config.group}
+
+spring:
+  cloud:
+    inetutils:
+      preferred-networks:
+        - 10.0.0
+    loadbalancer:
+      client:
+        enabled: true
+        rule: devGray
+    nacos:
+      username: ${soflyit.nacos.username}
+      password: ${soflyit.nacos.password}
+      discovery:
+        server-addr: ${soflyit.nacos.discovery.server}
+        namespace: ${soflyit.nacos.discovery.namespace}
+        group: ${soflyit.nacos.discovery.group}
+        metadata:
+          dev-gray: server-1
+
+      config:
+        server-addr: ${soflyit.nacos.config.server}
+        namespace: ${soflyit.nacos.config.namespace}
+        group: ${soflyit.nacos.config.group}
+        file-extension: yml
+        shared-configs[0]:
+          data-id: eim-application.${spring.cloud.nacos.config.file-extension}
+          group: ${soflyit.nacos.config.group}
+          refresh: true
+xxl:
+  job:
+    executor:
+      port: 9999

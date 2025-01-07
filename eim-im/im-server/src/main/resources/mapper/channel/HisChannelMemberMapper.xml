@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.channel.mapper.HisChannelMemberMapper">
+
+    <resultMap type="HisChannelMember" id="HisChannelMemberResult">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="joinTime" column="join_time"/>
+        <result property="leaveTime" column="leave_time"/>
+        <result property="memberData" column="member_data"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectHisChannelMemberVo">
+        select id, member_id, channel_id, user_id, join_time, leave_time, member_data, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME from his_channel_member
+    </sql>
+
+    <select id="selectHisChannelMemberList" parameterType="HisChannelMember" resultMap="HisChannelMemberResult">
+        <include refid="selectHisChannelMemberVo"/>
+        <where>
+            <if test="memberId != null "> and member_id = #{memberId}</if>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="joinTime != null "> and join_time = #{joinTime}</if>
+            <if test="leaveTime != null "> and leave_time = #{leaveTime}</if>
+            <if test="memberData != null "> and member_data = #{memberData}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectHisChannelMemberById" parameterType="Long" resultMap="HisChannelMemberResult">
+        <include refid="selectHisChannelMemberVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertHisChannelMember" parameterType="HisChannelMember" useGeneratedKeys="true" keyProperty="id">
+        insert into his_channel_member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="memberId != null">member_id,</if>
+            <if test="channelId != null">channel_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="joinTime != null">join_time,</if>
+            <if test="leaveTime != null">leave_time,</if>
+            <if test="memberData != null">member_data,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="memberId != null">#{memberId},</if>
+            <if test="channelId != null">#{channelId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="joinTime != null">#{joinTime},</if>
+            <if test="leaveTime != null">#{leaveTime},</if>
+            <if test="memberData != null">#{memberData},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHisChannelMember" parameterType="HisChannelMember">
+        update his_channel_member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="joinTime != null">join_time = #{joinTime},</if>
+            <if test="leaveTime != null">leave_time = #{leaveTime},</if>
+            <if test="memberData != null">member_data = #{memberData},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHisChannelMemberById" parameterType="Long">
+        delete from his_channel_member where id = #{id}
+    </delete>
+
+    <delete id="deleteHisChannelMemberByIds" parameterType="String">
+        delete from his_channel_member where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

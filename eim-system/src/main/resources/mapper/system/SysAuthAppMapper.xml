@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.system.mapper.SysAuthAppMapper">
+
+
+    <resultMap type="SysAuthApp" id="SysAuthAppResult">
+            <result property="id" column="id"/>
+            <result property="clientId" column="client_id"/>
+            <result property="name" column="name"/>
+            <result property="loginUrl" column="login_url"/>
+            <result property="secretType" column="secret_type"/>
+            <result property="secretPub" column="secret_pub"/>
+            <result property="secretPrivate" column="secret_private"/>
+            <result property="ssoType" column="sso_type"/>
+            <result property="authProtocol" column="auth_protocol"/>
+            <result property="authMode" column="auth_mode"/>
+            <result property="status" column="status"/>
+            <result property="remark" column="remark"/>
+            <result property="seq" column="seq"/>
+            <result property="logoutUrl" column="logout_url"/>
+            <result property="logoutType" column="logout_type"/>
+            <result property="revision" column="revision"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectSysAuthAppVo">
+        select id, client_id, name, login_url, secret_type, secret_pub, secret_private, sso_type,
+        auth_protocol, auth_mode, status, remark, seq, logout_url, logout_type, revision, create_by, create_time, update_by, update_time
+        from sys_auth_app
+    </sql>
+
+    <select id="selectSysAuthAppList" parameterType="SysAuthApp" resultMap="SysAuthAppResult">
+        <include refid="selectSysAuthAppVo"/>
+        <where>
+                        <if test="clientId != null  and clientId != ''">
+                            and client_id = #{clientId}
+                        </if>
+                        <if test="name != null  and name != ''">
+                            and name like concat('%', #{name}, '%')
+                        </if>
+                        <if test="loginUrl != null  and loginUrl != ''">
+                            and login_url = #{loginUrl}
+                        </if>
+                        <if test="secretType != null ">
+                            and secret_type = #{secretType}
+                        </if>
+                        <if test="secretPub != null  and secretPub != ''">
+                            and secret_pub = #{secretPub}
+                        </if>
+                        <if test="secretPrivate != null  and secretPrivate != ''">
+                            and secret_private = #{secretPrivate}
+                        </if>
+                        <if test="ssoType != null  and ssoType != ''">
+                            and sso_type = #{ssoType}
+                        </if>
+                        <if test="authProtocol != null ">
+                            and auth_protocol = #{authProtocol}
+                        </if>
+                        <if test="authMode != null ">
+                            and auth_mode = #{authMode}
+                        </if>
+                        <if test="status != null ">
+                            and status = #{status}
+                        </if>
+                        <if test="seq != null ">
+                            and seq = #{seq}
+                        </if>
+                        <if test="logoutUrl != null  and logoutUrl != ''">
+                            and logout_url = #{logoutUrl}
+                        </if>
+                        <if test="logoutType != null ">
+                            and logout_type = #{logoutType}
+                        </if>
+                        <if test="revision != null  and revision != ''">
+                            and revision = #{revision}
+                        </if>
+                        <if test="createBy != null  and createBy != ''">
+                            and create_by = #{createBy}
+                        </if>
+                        <if test="createTime != null ">
+                            and create_time = #{createTime}
+                        </if>
+                        <if test="updateBy != null  and updateBy != ''">
+                            and update_by = #{updateBy}
+                        </if>
+                        <if test="updateTime != null ">
+                            and update_time = #{updateTime}
+                        </if>
+        </where>
+        order by seq
+    </select>
+
+    <select id="selectAppList" parameterType="SysAuthApp" resultMap="SysAuthAppResult">
+        <include refid="selectSysAuthAppVo" />
+        where status = 1
+        order by seq
+    </select>
+
+    <select id="selectList" parameterType="SysAuthApp" resultMap="SysAuthAppResult">
+        <include refid="selectSysAuthAppVo"/>
+        <where>
+            <if test="clientId != null  and clientId != ''">
+                and client_id = #{clientId}
+            </if>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="loginUrl != null  and loginUrl != ''">
+                and login_url = #{loginUrl}
+            </if>
+            <if test="secretType != null ">
+                and secret_type = #{secretType}
+            </if>
+            <if test="secretPub != null  and secretPub != ''">
+                and secret_pub = #{secretPub}
+            </if>
+            <if test="secretPrivate != null  and secretPrivate != ''">
+                and secret_private = #{secretPrivate}
+            </if>
+            <if test="ssoType != null  and ssoType != ''">
+                and sso_type = #{ssoType}
+            </if>
+            <if test="authProtocol != null ">
+                and auth_protocol = #{authProtocol}
+            </if>
+            <if test="authMode != null ">
+                and auth_mode = #{authMode}
+            </if>
+            <if test="status != null ">
+                and status = #{status}
+            </if>
+            <if test="seq != null ">
+                and seq = #{seq}
+            </if>
+            <if test="logoutUrl != null  and logoutUrl != ''">
+                and logout_url = #{logoutUrl}
+            </if>
+            <if test="logoutType != null ">
+                and logout_type = #{logoutType}
+            </if>
+            <if test="revision != null  and revision != ''">
+                and revision = #{revision}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null ">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null ">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+        order by seq
+    </select>
+
+    <select id="selectSysAuthAppById" parameterType="Long"
+            resultMap="SysAuthAppResult">
+            <include refid="selectSysAuthAppVo"/>
+            where id = #{id}
+        order by seq
+    </select>
+
+    <insert id="insertSysAuthApp" parameterType="SysAuthApp">
+        insert into sys_auth_app
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="id != null">id,</if>
+                    <if test="clientId != null">client_id,</if>
+                    <if test="name != null">name,</if>
+                    <if test="loginUrl != null">login_url,</if>
+                    <if test="secretType != null">secret_type,</if>
+                    <if test="secretPub != null">secret_pub,</if>
+                    <if test="secretPrivate != null">secret_private,</if>
+                    <if test="ssoType != null">sso_type,</if>
+                    <if test="authProtocol != null">auth_protocol, </if>
+                    <if test="authMode != null">auth_mode, </if>
+                    <if test="status != null">status,</if>
+                    <if test="remark != null">remark,</if>
+                    <if test="seq != null">seq,</if>
+                    <if test="logoutUrl != null">logout_url,</if>
+                    <if test="logoutType != null">logout_type,</if>
+                    <if test="revision != null">revision, </if>
+                    <if test="createBy != null">create_by, </if>
+                    <if test="createTime != null">create_time, </if>
+                    <if test="updateBy != null">update_by,</if>
+                    <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="id != null">#{id},</if>
+                    <if test="clientId != null">#{clientId},</if>
+                    <if test="name != null">#{name}, </if>
+                    <if test="loginUrl != null">#{loginUrl},</if>
+                    <if test="secretType != null">#{secretType},</if>
+                    <if test="secretPub != null">#{secretPub},</if>
+                    <if test="secretPrivate != null">#{secretPrivate},</if>
+                    <if test="ssoType != null">#{ssoType},</if>
+                    <if test="authProtocol != null">#{authProtocol},</if>
+                    <if test="authMode != null">#{authMode},</if>
+                    <if test="status != null">#{status},</if>
+                    <if test="remark != null">#{remark},</if>
+                    <if test="seq != null">#{seq},</if>
+                    <if test="logoutUrl != null">#{logoutUrl},</if>
+                    <if test="logoutType != null">#{logoutType},</if>
+                    <if test="revision != null">#{revision},</if>
+                    <if test="createBy != null">#{createBy},</if>
+                    <if test="createTime != null">#{createTime},</if>
+                    <if test="updateBy != null">#{updateBy},</if>
+                    <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysAuthApp" parameterType="SysAuthApp">
+        update sys_auth_app
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="clientId != null">client_id =
+                        #{clientId},
+                    </if>
+                    <if test="name != null">name =
+                        #{name},
+                    </if>
+                    <if test="loginUrl != null">login_url =
+                        #{loginUrl},
+                    </if>
+                    <if test="secretType != null">secret_type =
+                        #{secretType},
+                    </if>
+                    <if test="secretPub != null">secret_pub =
+                        #{secretPub},
+                    </if>
+                    <if test="secretPrivate != null">secret_private =
+                        #{secretPrivate},
+                    </if>
+                    <if test="ssoType != null">sso_type =
+                        #{ssoType},
+                    </if>
+                    <if test="authProtocol != null">auth_protocol =
+                        #{authProtocol},
+                    </if>
+                    <if test="authMode != null">auth_mode =
+                        #{authMode},
+                    </if>
+                    <if test="status != null">status =
+                        #{status},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="seq != null">seq =
+                        #{seq},
+                    </if>
+                    <if test="logoutUrl != null">logout_url =
+                        #{logoutUrl},
+                    </if>
+                    <if test="logoutType != null">logout_type =
+                        #{logoutType},
+                    </if>
+                    <if test="revision != null">revision =
+                        #{revision},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysAuthAppById" parameterType="Long">
+        delete from sys_auth_app where id = #{id}
+    </delete>
+
+    <delete id="deleteSysAuthAppByIds" parameterType="String">
+        delete from sys_auth_app where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

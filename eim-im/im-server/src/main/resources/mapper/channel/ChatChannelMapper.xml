@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.channel.mapper.ChatChannelMapper">
+
+    <resultMap type="ChatChannel" id="ChatChannelResult">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="icon" column="icon"/>
+        <result property="lastMsgTime" column="last_msg_time"/>
+        <result property="totalMsgCount" column="total_msg_count"/>
+        <result property="lastRootMsgTime" column="last_root_msg_time"/>
+        <result property="totalRootMsgCount" column="total_root_msg_count"/>
+        <result property="remark" column="remark"/>
+        <result property="extData" column="ext_data"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="deleteBy" column="delete_by"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+
+    <sql id="selectChatChannelVo">
+        select id, code, name, type, icon, last_msg_time, total_msg_count, last_root_msg_time, total_root_msg_count, remark, ext_data, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, delete_by, delete_time from chat_channel
+    </sql>
+
+    <select id="selectChatChannelList" parameterType="ChatChannel" resultMap="ChatChannelResult">
+        <include refid="selectChatChannelVo"/>
+        <where>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="icon != null "> and icon = #{icon}</if>
+            <if test="lastMsgTime != null "> and last_msg_time = #{lastMsgTime}</if>
+            <if test="totalMsgCount != null "> and total_msg_count = #{totalMsgCount}</if>
+            <if test="lastRootMsgTime != null "> and last_root_msg_time = #{lastRootMsgTime}</if>
+            <if test="totalRootMsgCount != null "> and total_root_msg_count = #{totalRootMsgCount}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+            <if test="deleteBy != null "> and delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and delete_time = #{deleteTime}</if>
+            <if test="params.includeDeleted == null or (params.includeDeleted!=null and !params.includeDeleted)"> and delete_time &lt; 0 </if>
+        </where>
+    </select>
+
+    <select id="selectChatChannelById" parameterType="Long" resultMap="ChatChannelResult">
+        <include refid="selectChatChannelVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertChatChannel" parameterType="ChatChannel" useGeneratedKeys="true" keyProperty="id">
+        insert into chat_channel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="type != null">type,</if>
+            <if test="icon != null">icon,</if>
+            <if test="lastMsgTime != null">last_msg_time,</if>
+            <if test="totalMsgCount != null">total_msg_count,</if>
+            <if test="lastRootMsgTime != null">last_root_msg_time,</if>
+            <if test="totalRootMsgCount != null">total_root_msg_count,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="extData != null and extData != ''">ext_data,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="type != null">#{type},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="lastMsgTime != null">#{lastMsgTime},</if>
+            <if test="totalMsgCount != null">#{totalMsgCount},</if>
+            <if test="lastRootMsgTime != null">#{lastRootMsgTime},</if>
+            <if test="totalRootMsgCount != null">#{totalRootMsgCount},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="extData != null and extData != ''">#{extData},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateChatChannel" parameterType="ChatChannel">
+        update chat_channel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="lastMsgTime != null">last_msg_time = #{lastMsgTime},</if>
+            <if test="totalMsgCount != null">total_msg_count = #{totalMsgCount},</if>
+            <if test="lastRootMsgTime != null">last_root_msg_time = #{lastRootMsgTime},</if>
+            <if test="totalRootMsgCount != null">total_root_msg_count = #{totalRootMsgCount},</if>
+            <if test="extData != null and extData != ''">ext_data=#{extData},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateChatChannelRemark" parameterType="ChatChannel">
+        update chat_channel
+        <trim prefix="SET" suffixOverrides=",">
+            remark = #{remark},
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteChatChannelById" parameterType="Long">
+        delete from chat_channel where id = #{id}
+    </delete>
+
+    <delete id="deleteChatChannelByIds" parameterType="String">
+        delete from chat_channel where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectChannelByUserId"  parameterType="ChatChannel" resultMap="ChatChannelResult">
+        select t.id, t.code, t.name, t.type, t.icon, t.last_msg_time, t.total_msg_count, t.last_root_msg_time,
+        t.total_root_msg_count, t.remark, t.TENANT_ID, t.REVISION, t.CREATE_BY, t.CREATE_TIME,
+        t.UPDATE_BY, t.ext_data, t.UPDATE_TIME, t.delete_by, t.delete_time from chat_channel t
+        <if test="params!=null and params.userId!=null">
+            join channel_member m on t.id=m.channel_id
+        </if>
+        <where>
+            <if test="type!=null"> and t.type=#{type}</if>
+            <if test="params!=null and params.userId!=null"> and m.user_id=#{params.userId}</if>
+            <if test="params!=null and params.pinnedFlag!=null"> and m.pinned_flag = #{pinnedFlag}</if>
+        </where>
+    </select>
+</mapper>

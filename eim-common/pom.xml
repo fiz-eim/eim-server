@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.soflyit.cloud.open</groupId>
+        <artifactId>eim-server</artifactId>
+        <version>${eim-cloud.version}${eim-cloud.changelist}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>eim-common-core</module>
+        <module>eim-common-redis</module>
+        <module>eim-common-swagger</module>
+        <module>eim-common-security</module>
+        <module>eim-common-datascope</module>
+        <module>eim-common-datasource</module>
+        <module>eim-common-auth</module>
+        <module>eim-common-id</module>
+        <module>eim-common-mybatis</module>
+        <module>eim-common-minio</module>
+    </modules>
+
+    <artifactId>eim-common</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+	    eim-common通用模块
+    </description>
+
+</project>

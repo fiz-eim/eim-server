@@ -1,0 +1,13 @@
+server:
+  port: 9200
+
+spring:
+  application:
+    name: eim-auth
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+eim-eim:
+  version: eim-eim-version

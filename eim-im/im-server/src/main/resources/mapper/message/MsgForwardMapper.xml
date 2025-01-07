@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgForwardMapper">
+
+    <resultMap type="MsgForward" id="MsgForwardResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="forwardMsgId" column="forward_msg_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="deletedFlag" column="deleted_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectMsgForwardVo">
+        select id, msg_id, forward_msg_id, sort_order, deleted_flag, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME from msg_forward
+    </sql>
+
+    <select id="selectMsgForwardList" parameterType="MsgForward" resultMap="MsgForwardResult">
+        <include refid="selectMsgForwardVo"/>
+        <where>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="forwardMsgId != null "> and forward_msg_id = #{forwardMsgId}</if>
+            <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
+            <if test="deletedFlag != null "> and deleted_flag = #{deletedFlag}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectMsgForwardById" parameterType="Long" resultMap="MsgForwardResult">
+        <include refid="selectMsgForwardVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMsgForward" parameterType="MsgForward" useGeneratedKeys="true" keyProperty="id">
+        insert into msg_forward
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">msg_id,</if>
+            <if test="forwardMsgId != null">forward_msg_id,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="deletedFlag != null">deleted_flag,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">#{msgId},</if>
+            <if test="forwardMsgId != null">#{forwardMsgId},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="deletedFlag != null">#{deletedFlag},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMsgForward" parameterType="MsgForward">
+        update msg_forward
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="msgId != null">msg_id = #{msgId},</if>
+            <if test="forwardMsgId != null">forward_msg_id = #{forwardMsgId},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="deletedFlag != null">deleted_flag = #{deletedFlag},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMsgForwardById" parameterType="Long">
+        delete from msg_forward where id = #{id}
+    </delete>
+
+    <delete id="deleteMsgForwardByIds" parameterType="String">
+        delete from msg_forward where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

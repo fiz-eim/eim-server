@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.dx.modular.resource.resource.mapper.ResourceMapper">
+
+    <delete id="cancelDelete">
+        update dx_resource dr set dr.DELETE_FLAG  = 2
+        where dr.RESOURCE_ID  = #{resourceId}
+    </delete>
+
+    <select id="getParentAndSelf"
+            resultType="com.soflyit.chattask.dx.modular.resource.resource.domain.entity.ResourceEntity">
+        <!--WITH RECURSIVE folder_hierarchy AS (
+            SELECT RESOURCE_ID,FOLDER_ID, RESOURCE_NAME, FOLDER_PARENT_ID
+            FROM dx_resource
+            WHERE FOLDER_ID =  #{folderId}  and DELETE_FLAG = 2
+            UNION ALL
+            SELECT dx.RESOURCE_ID,dx.FOLDER_ID, dx.RESOURCE_NAME, dx.FOLDER_PARENT_ID
+            FROM dx_resource dx
+                     INNER JOIN folder_hierarchy fh ON dx.FOLDER_ID = fh.FOLDER_PARENT_ID
+                and dx.DELETE_FLAG = 2
+        )
+        SELECT *
+        FROM folder_hierarchy-->
+
+        -- 根据一个子节点id，查询所有父节点（包含⾃⾝）
+        SELECT t2.RESOURCE_ID,
+               t2.FOLDER_ID,
+               t2.RESOURCE_NAME,
+               t2.FOLDER_PARENT_ID
+        FROM (SELECT @r                                                                     AS _id,
+                     (SELECT @r := FOLDER_PARENT_ID FROM dx_resource WHERE FOLDER_ID = _id) AS pid,
+                     @l := @l + 1                                                           AS lvl
+              FROM (SELECT @r := #{folderId}, @l := 0) vars,
+                   dx_resource AS h
+              WHERE @r <![CDATA[<>]]> 0) t1
+                 JOIN dx_resource t2 ON t1._id = t2.FOLDER_ID
+        ORDER BY T1.lvl DESC
+    </select>
+    <select id="getChildAndSelf"
+            resultType="com.soflyit.chattask.dx.modular.resource.resource.domain.entity.ResourceEntity">
+        <!--WITH RECURSIVE subfolders AS (
+            SELECT *
+            FROM dx_resource
+            WHERE FOLDER_ID = #{folderId}  and DELETE_FLAG = 2
+            UNION ALL
+            SELECT r.*
+            FROM dx_resource r
+                     INNER JOIN subfolders s ON r.FOLDER_PARENT_ID = s.FOLDER_ID and r.DELETE_FLAG = 2
+        )
+        SELECT *
+        FROM subfolders;-->
+        -- 根据⼀个⽗节点查询所有⼦节点（包含⾃⾝）
+        SELECT au.*
+        FROM (SELECT * FROM dx_resource WHERE FOLDER_PARENT_ID IS NOT NULL) au,
+        (SELECT @pid := #{folderId}) pd
+        WHERE FIND_IN_SET(FOLDER_PARENT_ID, @pid) > 0
+        AND @pid := concat(@pid, ',', FOLDER_ID)
+        UNION
+        SELECT *
+        FROM dx_resource
+        WHERE FOLDER_ID = #{folderId}
+        ORDER BY FOLDER_ID
+    </select>
+
+    <select id="getResourceByDelete"
+            resultType="com.soflyit.chattask.dx.modular.resource.resource.domain.entity.ResourceEntity">
+        SELECT *
+        FROM dx_resource where DELETE_FLAG = #{deleteFlag} and  RESOURCE_ID in
+        <foreach collection="resources" item="resource" index="index" open="(" close=")" separator=",">
+            #{resource}
+        </foreach>
+    </select>
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgReactionMapper">
+
+    <resultMap type="MsgReaction" id="MsgReactionResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="emojiName" column="emoji_name"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="deleteBy" column="delete_by"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+
+    <sql id="selectMsgReactionVo">
+        select id, msg_id, user_id, emoji_name, channel_id, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, delete_by, delete_time from msg_reaction
+    </sql>
+
+    <select id="selectMsgReactionList" parameterType="MsgReaction" resultMap="MsgReactionResult">
+        <include refid="selectMsgReactionVo"/>
+        <where>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="emojiName != null  and emojiName != ''"> and emoji_name like concat('%', #{emojiName}, '%')</if>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+            <if test="deleteBy != null "> and delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and delete_time = #{deleteTime}</if>
+        </where>
+    </select>
+
+    <select id="selectMsgReactionById" parameterType="Long" resultMap="MsgReactionResult">
+        <include refid="selectMsgReactionVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMsgReaction" parameterType="MsgReaction" useGeneratedKeys="true" keyProperty="id">
+        insert into msg_reaction
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">msg_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="emojiName != null and emojiName != ''">emoji_name,</if>
+            <if test="channelId != null">channel_id,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">#{msgId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="emojiName != null and emojiName != ''">#{emojiName},</if>
+            <if test="channelId != null">#{channelId},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMsgReaction" parameterType="MsgReaction">
+        update msg_reaction
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="msgId != null">msg_id = #{msgId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="emojiName != null and emojiName != ''">emoji_name = #{emojiName},</if>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMsgReactionById" parameterType="Long">
+        delete from msg_reaction where id = #{id}
+    </delete>
+
+    <delete id="deleteMsgReactionByIds" parameterType="String">
+        delete from msg_reaction where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

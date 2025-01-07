@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.soflyit.cloud.open</groupId>
+        <artifactId>eim-server</artifactId>
+        <version>${eim-cloud.version}${eim-cloud.changelist}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.soflyit.chat-task</groupId>
+    <artifactId>eim-dms</artifactId>
+    <description>文档管理服务</description>
+
+    <properties>
+        <activiti.version>6.0.0</activiti.version>
+        <activiti-json-converter.version>5.22.0</activiti-json-converter.version>
+        <alibaba.dingtalk.version>2.0.0</alibaba.dingtalk.version>
+        <alibaba.dubbo.version>2.5.3</alibaba.dubbo.version>
+        <alibaba.easyexcel.version>2.1.6</alibaba.easyexcel.version>
+        <alibaba.nacos.version>2.0.4</alibaba.nacos.version>
+        <batik.versoin>1.7</batik.versoin>
+        <commons.fileupload.version>1.4</commons.fileupload.version>
+        <commons.io.version>2.11.0</commons.io.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <commons-text.version>1.8</commons-text.version>
+        <dm-jdbc.version>8</dm-jdbc.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <druid.version>1.2.8</druid.version>
+        <dynamic-ds.version>3.5.0</dynamic-ds.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <groovy-all.version>2.4.14</groovy-all.version>
+        <h2-jdbc.version>1.4.200</h2-jdbc.version>
+        <hadoop.version>3.0.0-cdh6.3.2</hadoop.version>
+        <hive-jdbc.version>2.1.1-cdh6.3.2</hive-jdbc.version>
+        <impala-jdbc.version>2.6.2</impala-jdbc.version>
+        <eim-cloud.version>1.0.0</eim-cloud.version>
+        <eim-cloud.changelist>-SNAPSHOT</eim-cloud.changelist>
+        <itext.version>5.2.0</itext.version>
+        <java.version>1.8</java.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <json-lib.version>2.4</json-lib.version>
+        <jsoup.version>1.13.1</jsoup.version>
+        <kaptcha.version>2.3.2</kaptcha.version>
+        <kettle.version>9.1.0.0-324</kettle.version>
+        <knife4j.version>3.0.3</knife4j.version>
+        <mail.version>1.5.0-b01</mail.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <milo.version>0.6.5</milo.version>
+        <minio.version>8.2.2</minio.version>
+        <mssql-jdbc.version>8.2.2.jre8</mssql-jdbc.version>
+        <mybatis-plus.version>3.5.1</mybatis-plus.version>
+        <mybatis-plus-datasource.version>3.4.1</mybatis-plus-datasource.version>
+        <ojdbc6-jdbc.version>11.2.0.4</ojdbc6-jdbc.version>
+        <ojdbc8-jdbc.version>12.2.0.1</ojdbc8-jdbc.version>
+        <pagehelper.boot.version>1.4.1</pagehelper.boot.version>
+        <pinyin4j.version>2.5.1</pinyin4j.version>
+        <poi.version>4.1.2</poi.version>
+        <postgresql-jdbc.version>42.2.5</postgresql-jdbc.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <sap-jdbc.version>2.7.15</sap-jdbc.version>
+        <spring-boot.version>2.6.4</spring-boot.version>
+        <spring-boot-admin.version>2.6.2</spring-boot-admin.version>
+        <spring-boot-mybatis.version>2.2.2</spring-boot-mybatis.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
+        <swagger.core.version>1.6.2</swagger.core.version>
+        <swagger.fox.version>3.0.0</swagger.fox.version>
+        <taglibs.version>1.1.2</taglibs.version>
+        <tdengine-jdbc.version>2.0.37</tdengine-jdbc.version>
+        <tobato.version>1.27.2</tobato.version>
+        <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
+        <velocity.version>2.3</velocity.version>
+        <xmemcached.version>2.0.1</xmemcached.version>
+        <checker-qual.version>3.19.0</checker-qual.version>
+        <errorprone.version>2.10.0</errorprone.version>
+        <javassist.version>3.25.0-GA</javassist.version>
+        <jsqlparser.version>4.3</jsqlparser.version>
+        <mybatis-spring.version>2.0.7</mybatis-spring.version>
+        <hutool.version>5.8.8</hutool.version>
+        <redisson.version>3.25.0</redisson.version>
+        <project.name.prefix>eim</project.name.prefix>
+    </properties>
+
+
+    <dependencies>
+    	<!-- SpringCloud Alibaba Nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--Spring Boot 测试-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- SpringCloud Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+    	<!-- SpringCloud Alibaba Sentinel -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+
+    	<!-- SpringBoot Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Mysql Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <!-- Industry Common DataSource -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-datasource</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+                    <groupId>com.alibaba.cloud</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Industry Common DataScope -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-datascope</artifactId>
+        </dependency>
+
+        <!-- Industry Common Core -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-core</artifactId>
+        </dependency>
+
+        <!-- Industry Common Swagger -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-swagger</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+        <!-- hutool -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-id</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-minio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!--deploy skip-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-config</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/dist/config</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>*.xml</include>
+                                        <include>*.yml</include>
+                                        <include>i18n/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>lang/**</exclude>
+                                        <exclude>mapper/**</exclude>
+                                        <exclude>*.txt</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>*.yml</exclude>
+                        <exclude>i18n/*</exclude>
+                        <exclude>logback-spring.xml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-lib-src</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/dist/lib"/>
+
+                                <copy todir="${project.build.directory}/dist/">
+                                    <fileset dir="${project.build.directory}/">
+                                        <include name="*.jar"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/classes">
+                                    <fileset dir="${project.build.directory}/dist/config">
+                                        <include name="*.xml"/>
+                                        <include name="*.yml"/>
+                                    </fileset>
+                                </copy>
+                                <zip destfile="${project.build.directory}/${project.build.finalName}.zip">
+                                    <zipfileset dir="${project.build.directory}/dist"/>
+                                </zip>
+                                <delete dir="${project.build.directory}/bin"  includeemptydirs="true"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

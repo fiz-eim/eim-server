@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.soflyit.cloud.open</groupId>
+        <artifactId>eim-server</artifactId>
+        <version>${eim-cloud.version}${eim-cloud.changelist}</version>
+    </parent>
+    <artifactId>eim-build</artifactId>
+    <name>eim-build</name>
+    <description>eim-build</description>
+    <packaging>pom</packaging>
+    <properties>
+        <java.version>8</java.version>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="projectRootDir" value="${project.basedir}/.."/>
+                                <delete file="${projectRootDir}/eim-dist.tar.gz"/>
+                                <delete file="${projectRootDir}/eim-config.zip"/>
+<!--                                <delete dir="${projectRootDir}/logs"/>-->
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-all</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <property name="projectRootDir" value="${project.basedir}/.."/>
+                                <property name="eimReleaseDir" value="${projectRootDir}/dist"/>
+                                <property name="projectReleaseDir" value="${eimReleaseDir}/eim-application"/>
+                                <property name="applicationReleaseDir" value="${eimReleaseDir}/application"/>
+                                <property name="projectReleaseConfigDir" value="${projectRootDir}/config"/>
+                                <mkdir dir="${projectReleaseDir}/gateway"></mkdir>
+                                <mkdir dir="${projectReleaseDir}/auth"></mkdir>
+                                <mkdir dir="${projectReleaseDir}/system"></mkdir>
+                                <mkdir dir="${projectReleaseDir}/eim"></mkdir>
+                                <mkdir dir="${projectReleaseDir}/dms"></mkdir>
+
+                                <copy todir="${projectReleaseDir}/gateway">
+                                    <fileset dir="${projectRootDir}/eim-gateway/target/">
+                                        <include name="*.zip"/>
+                                    </fileset>
+                                </copy>
+                                <unzip src="${projectReleaseDir}/gateway/eim-gateway.zip" dest="${projectReleaseDir}/gateway"/>
+                                <delete file="${projectReleaseDir}/gateway/eim-gateway.zip"/>
+
+                                <copy todir="${projectReleaseDir}/auth">
+                                    <fileset dir="${projectRootDir}/eim-auth/target/">
+                                        <include name="*.zip"/>
+                                    </fileset>
+                                </copy>
+                                <unzip src="${projectReleaseDir}/auth/eim-auth.zip" dest="${projectReleaseDir}/auth"/>
+                                <delete file="${projectReleaseDir}/auth/eim-auth.zip"/>
+
+                                <copy todir="${projectReleaseDir}/system">
+                                    <fileset dir="${projectRootDir}/eim-system/target/">
+                                        <include name="*.zip"/>
+                                    </fileset>
+                                </copy>
+                                <unzip src="${projectReleaseDir}/system/eim-system.zip" dest="${projectReleaseDir}/system"/>
+                                <delete file="${projectReleaseDir}/system/eim-system.zip"/>
+
+                                <copy todir="${projectReleaseDir}/eim">
+                                    <fileset dir="${projectRootDir}/eim-im/im-server/target/">
+                                        <include name="*.zip"/>
+                                    </fileset>
+                                </copy>
+                                <unzip src="${projectReleaseDir}/eim/eim-im.zip" dest="${projectReleaseDir}/eim"/>
+                                <delete file="${projectReleaseDir}/eim/eim-im.zip"/>
+
+                                <copy todir="${projectReleaseDir}/dms">
+                                    <fileset dir="${projectRootDir}/eim-dms/target/">
+                                        <include name="*.zip"/>
+                                    </fileset>
+                                </copy>
+                                <unzip src="${projectReleaseDir}/dms/eim-dms.zip" dest="${projectReleaseDir}/dms"/>
+                                <delete file="${projectReleaseDir}/dms/eim-dms.zip"/>
+
+                                <copy todir="${projectReleaseDir}/docker">
+                                    <fileset dir="${project.basedir}/src/docker/">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${applicationReleaseDir}">
+                                    <fileset dir="${project.basedir}/src/config">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+
+
+                                <tar destfile="${projectRootDir}/eim-dist.tar" basedir="${eimReleaseDir}"/>
+
+                                <gzip destfile="${projectRootDir}/eim-dist.tar.gz" src="${projectRootDir}/eim-dist.tar"/>
+
+                                <delete dir="${eimReleaseDir}"/>
+                                <delete file="${projectRootDir}/eim-dist.tar"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

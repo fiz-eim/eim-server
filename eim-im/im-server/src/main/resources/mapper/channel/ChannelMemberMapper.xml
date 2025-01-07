@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.channel.mapper.ChannelMemberMapper">
+
+    <resultMap type="ChannelMember" id="ChannelMemberResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="realName" column="real_name"/>
+        <result property="manager" column="manager"/>
+        <result property="pinnedFlag" column="pinned_flag"/>
+        <result property="dndFlag" column="dnd_flag"/>
+        <result property="lastViewTime" column="last_view_time"/>
+        <result property="msgCount" column="msg_count"/>
+        <result property="unreadCount" column="unread_count"/>
+        <result property="mentionCount" column="mention_count"/>
+        <result property="notifyProps" column="notify_props"/>
+        <result property="rootMsgCount" column="root_msg_count"/>
+        <result property="mentionRootCount" column="mention_root_count"/>
+        <result property="urgentMentionCount" column="urgent_mention_count"/>
+        <result property="memberType" column="member_type"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="displayName" column="display_name"/>
+        <result property="collapse" column="collapse"/>
+        <result property="extData" column="ext_data"/>
+    </resultMap>
+
+    <sql id="selectChannelMemberVo">
+        select t.id, t.user_id, t.channel_id, t.real_name, t.manager, t.pinned_flag, t.dnd_flag, t.last_view_time, t.msg_count,
+               t.unread_count, t.mention_count, t.notify_props, t.root_msg_count, t.mention_root_count, t.urgent_mention_count,
+               t.remark, t.member_type, t.TENANT_ID, t.REVISION, t.CREATE_BY, t.CREATE_TIME, t.UPDATE_BY, t.UPDATE_TIME, t.nick_name,
+               t.display_name, t.collapse, t.ext_data from channel_member t
+    </sql>
+
+    <select id="selectChannelMemberList" parameterType="ChannelMember" resultMap="ChannelMemberResult">
+        <include refid="selectChannelMemberVo"/>
+        <if test="params.includeDeleted == null or (params.includeDeleted!=null and !params.includeDeleted)"> join chat_channel t1 on t.channel_id=t1.id</if>
+        <where>
+            <if test="userId != null "> and t.user_id = #{userId}</if>
+            <if test="channelId != null "> and t.channel_id = #{channelId}</if>
+            <if test="realName != null  and realName != ''"> and t.real_name like concat('%', #{realName}, '%')</if>
+            <if test="manager != null "> and t.manager = #{manager}</if>
+            <if test="pinnedFlag != null "> and t.pinned_flag = #{pinnedFlag}</if>
+            <if test="dndFlag != null "> and t.dnd_flag = #{dndFlag}</if>
+            <if test="lastViewTime != null "> and t.last_view_time = #{lastViewTime}</if>
+            <if test="msgCount != null "> and t.msg_count = #{msgCount}</if>
+            <if test="unreadCount != null "> and t.unread_count = #{unreadCount}</if>
+            <if test="mentionCount != null "> and t.mention_count = #{mentionCount}</if>
+            <if test="notifyProps != null  and notifyProps != ''"> and t.notify_props = #{notifyProps}</if>
+            <if test="rootMsgCount != null "> and t.root_msg_count = #{rootMsgCount}</if>
+            <if test="mentionRootCount != null "> and t.mention_root_count = #{mentionRootCount}</if>
+            <if test="urgentMentionCount != null "> and t.urgent_mention_count = #{urgentMentionCount}</if>
+            <if test="tenantId != null "> and t.TENANT_ID = #{tenantId}</if>
+            <if test="memberType != null "> and t.member_type = #{memberType}</if>
+            <if test="revision != null "> and t.REVISION = #{revision}</if>
+            <if test="createBy != null "> and t.CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and t.CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and t.UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and t.UPDATE_TIME = #{updateTime}</if>
+            <if test="params.includeDeleted == null or (params.includeDeleted!=null and !params.includeDeleted)"> and t1.delete_time &lt; 0 </if>
+        </where>
+    </select>
+
+    <select id="selectChannelMemberById" parameterType="Long" resultMap="ChannelMemberResult">
+        <include refid="selectChannelMemberVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectDirectChannelIdByUserId" parameterType="Long" resultMap="ChannelMemberResult">
+        select t.id, t.user_id, t.channel_id from channel_member t join chat_channel c on c.id=t.channel_id
+        where t.user_id = #{userId} and c.type = 1
+    </select>
+
+    <select id="selectDirectChannelMembers" parameterType="list" resultMap="ChannelMemberResult">
+        select t.id, t.user_id, t.channel_id from channel_member t join chat_channel c on c.id=t.channel_id
+        where t.channel_id in <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <select id="selectChannelByUserId" parameterType="Long" resultMap="ChannelMemberResult">
+        <include refid="selectChannelMemberVo"/>
+        join chat_channel t1 on t.channel_id=t1.id
+        where t.user_id = #{userId} and t1.delete_time &lt; 0
+    </select>
+    <select id="selectMembersByBot" parameterType="Long" resultMap="ChannelMemberResult">
+        <include refid="selectChannelMemberVo"/>
+        JOIN chat_channel t1 ON t.channel_id = t1.id
+        WHERE
+        t.member_type=1 and t1.type=3 and t.channel_id in (select t3.channel_id from channel_member t3 where t3.user_id=#{userId} and t3.member_type=2)
+    </select>
+
+    <insert id="insertChannelMember" parameterType="ChannelMember">
+        insert into channel_member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="channelId != null">channel_id,</if>
+            <if test="realName != null and realName != ''">real_name,</if>
+            <if test="manager != null">manager,</if>
+            <if test="pinnedFlag != null">pinned_flag,</if>
+            <if test="dndFlag != null">dnd_flag,</if>
+            <if test="lastViewTime != null">last_view_time,</if>
+            <if test="msgCount != null">msg_count,</if>
+            <if test="unreadCount != null">unread_count,</if>
+            <if test="mentionCount != null">mention_count,</if>
+            <if test="notifyProps != null and notifyProps != ''">notify_props,</if>
+            <if test="rootMsgCount != null">root_msg_count,</if>
+            <if test="mentionRootCount != null">mention_root_count,</if>
+            <if test="urgentMentionCount != null">urgent_mention_count,</if>
+            <if test="memberType != null ">member_type,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+
+            <if test="nickName != null">nick_name,</if>
+            <if test="displayName != null">display_name,</if>
+            <if test="collapse != null">collapse,</if>
+            <if test="extData != null">ext_data,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="channelId != null">#{channelId},</if>
+            <if test="realName != null and realName != ''">#{realName},</if>
+            <if test="manager != null">#{manager},</if>
+            <if test="pinnedFlag != null">#{pinnedFlag},</if>
+            <if test="dndFlag != null">#{dndFlag},</if>
+            <if test="lastViewTime != null">#{lastViewTime},</if>
+            <if test="msgCount != null">#{msgCount},</if>
+            <if test="unreadCount != null">#{unreadCount},</if>
+            <if test="mentionCount != null">#{mentionCount},</if>
+            <if test="notifyProps != null and notifyProps != ''">#{notifyProps},</if>
+            <if test="rootMsgCount != null">#{rootMsgCount},</if>
+            <if test="mentionRootCount != null">#{mentionRootCount},</if>
+            <if test="urgentMentionCount != null">#{urgentMentionCount},</if>
+            <if test="memberType != null ">#{memberType},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+
+            <if test="nickName != null">#{nickName},</if>
+            <if test="displayName != null">#{displayName},</if>
+            <if test="collapse != null">#{collapse},</if>
+            <if test="extData != null">#{extData},</if>
+
+         </trim>
+    </insert>
+    <insert id="batchInsert"  parameterType="List">
+        insert into channel_member (id, user_id, channel_id, real_name, manager, pinned_flag, dnd_flag, last_view_time,
+            msg_count, unread_count, mention_count, notify_props, root_msg_count, mention_root_count, urgent_mention_count,
+            member_type, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY,UPDATE_TIME, nick_name, display_name,
+            collapse, ext_data)
+            values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.userId}, #{item.channelId}, #{item.realName}, #{item.manager}, #{item.pinnedFlag}, #{item.dndFlag}, #{item.lastViewTime},
+             #{item.msgCount}, #{item.unreadCount}, #{item.mentionCount}, #{item.notifyProps}, #{item.rootMsgCount}, #{item.mentionRootCount}, #{item.urgentMentionCount},
+             #{item.memberType}, #{item.remark}, #{item.tenantId}, #{item.revision}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime},
+             #{item.nickName}, #{item.displayName}, #{item.collapse}, #{item.extData}
+             )
+        </foreach>
+    </insert>
+
+    <update id="updateChannelMember" parameterType="ChannelMember">
+        update channel_member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="realName != null and realName != ''">real_name = #{realName},</if>
+            <if test="manager != null">manager = #{manager},</if>
+            <if test="pinnedFlag != null">pinned_flag = #{pinnedFlag},</if>
+            <if test="dndFlag != null">dnd_flag = #{dndFlag},</if>
+            <if test="lastViewTime != null">last_view_time = #{lastViewTime},</if>
+            <if test="msgCount != null">msg_count = #{msgCount},</if>
+            <if test="unreadCount != null">unread_count = #{unreadCount},</if>
+            <if test="mentionCount != null">mention_count = #{mentionCount},</if>
+            <if test="notifyProps != null and notifyProps != ''">notify_props = #{notifyProps},</if>
+            <if test="rootMsgCount != null">root_msg_count = #{rootMsgCount},</if>
+            <if test="mentionRootCount != null">mention_root_count = #{mentionRootCount},</if>
+            <if test="urgentMentionCount != null">urgent_mention_count = #{urgentMentionCount},</if>
+            <if test="memberType != null ">member_type = #{memberType},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            nick_name=#{nickName},
+            display_name=#{displayName},
+            <if test="collapse != null">collapse=#{collapse},</if>
+            <if test="extData != null and extData!=''">ext_data=#{extData},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteChannelMemberById" parameterType="Long">
+        delete from channel_member where id = #{id}
+    </delete>
+
+    <delete id="deleteChannelMemberByIds" parameterType="String">
+        delete from channel_member where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

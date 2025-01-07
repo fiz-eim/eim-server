@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.system.mapper.SysDeptMapper">
+
+    <resultMap type="SysDept" id="SysDeptResult">
+        <id property="deptId" column="dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="ancestors" column="ancestors"/>
+        <result property="deptCode" column="dept_code"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="leader" column="leader"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="orgType" column="org_type"/>
+        <result property="divisionCode" column="division_code"/>
+        <result property="divisionName" column="division_name"/>
+        <result property="parentName" column="parent_name"/>
+        <result property="parentCode" column="parent_code"/>
+        <result property="orgName" column="org_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="tanentCode" column="tanent_code"/>
+    </resultMap>
+
+    <sql id="selectDeptVo">
+        select d.dept_id, d.parent_id, d.ancestors, d.dept_code, d.dept_name,d.order_num, d.leader,d.phone,d.email, d.status,d.del_flag, d.org_type, d.division_code,d.create_by,
+        d.create_time,d.tanent_code from sys_dept d
+    </sql>
+    <sql id="selectDeptAndParentVo">
+        select DISTINCT d.dept_id, d.parent_id,p.dept_name parent_name,p.dept_code parent_code, d.ancestors,
+        d.dept_code,o.dict_label org_name,v.division_name,d.dept_name, d.order_num,d.leader, d.phone, d.email,
+        d.status,d.del_flag, d.org_type, d.division_code,d.create_by, d.create_time
+        from sys_dept d
+    </sql>
+    <select id="selectDeptList" parameterType="SysDept" resultMap="SysDeptResult">
+        <include refid="selectDeptAndParentVo"/>
+        left join sys_dept p on d.parent_id = p.dept_id
+        left join sys_dict_data o on o.dict_type = 'orgType' and d.org_type = o.dict_value
+        left join sys_division v on v.division_code = d.division_code
+        where d.del_flag = '0'
+        <if test="deptId != null and deptId != 0">
+            AND d.dept_id = #{deptId}
+        </if>
+        <if test="parentId != null and parentId != 0">
+            AND d.parent_id = #{parentId}
+        </if>
+        <if test="deptCode != null and deptCode != ''">
+            AND d.dept_code = #{deptCode}
+        </if>
+        <if test="orgType != null">
+            AND d.org_type = #{orgType}
+        </if>
+        <if test="deptName != null and deptName != ''">
+            AND d.dept_name like concat('%', #{deptName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND d.status = #{status}
+        </if>
+        <if test="params!=null and params.orgTypes !=null and params.orgTypes.size()>0">
+            and d.org_type in
+            <foreach collection="params.orgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and d.org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+        order by d.parent_id, d.order_num
+    </select>
+
+    <select id="getDeptListIds" resultMap="SysDeptResult" >
+        <include refid="selectDeptAndParentVo"/>
+        left join sys_dept p on d.parent_id = p.dept_id
+        left join sys_dict_data o on o.dict_type = 'orgType' and d.org_type = o.dict_value
+        left join sys_division v on v.division_code = d.division_code
+        where d.del_flag = '0' and d.dept_id in
+        <foreach collection="ids" item="deptId" separator="," open="(" close=")">
+            #{deptId}
+        </foreach>
+
+        order by d.parent_id, d.order_num
+    </select>
+
+    <select id="selectDeptListNoStatus" parameterType="SysDept" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        where d.del_flag = '0' and d.status = 0
+        <if test="params!=null and params.orgTypes !=null and params.orgTypes.size()>0">
+            and org_type in
+            <foreach collection="params.orgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+        order by d.parent_id, d.order_num
+    </select>
+
+    <select id="selectDeptListByRoleId" resultType="Long">
+        select d.dept_id
+        from sys_dept d
+        left join sys_role_dept rd on d.dept_id = rd.dept_id
+        where rd.role_id = #{roleId}
+        <if test="deptCheckStrictly">
+            and d.dept_id not in (select d.parent_id from sys_dept d inner join sys_role_dept rd on d.dept_id =
+            rd.dept_id and rd.role_id = #{roleId})
+        </if>
+        order by d.parent_id, d.order_num
+    </select>
+
+    <select id="selectDeptListByPostId" resultType="Long">
+        select d.dept_id
+        from sys_dept d
+        left join sys_dept_post sdp on d.dept_id = sdp.dept_id
+        where sdp.post_id = #{postId}
+        <if test="deptCheckStrictly">
+            and d.dept_id not in (select d.parent_id from sys_dept d inner join sys_dept_post sdp on d.dept_id =
+            sdp.dept_id and sdp.post_id = #{postId})
+        </if>
+        order by d.parent_id, d.order_num
+    </select>
+
+    <select id="selectDeptById" parameterType="Long" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        where dept_id = #{deptId}
+    </select>
+
+    <select id="selectDeptByDeptCode" parameterType="String" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        where d.dept_code = #{deptCode} and del_flag = 0
+    </select>
+
+    <select id="checkDeptExistUser" parameterType="Long" resultType="int">
+        select count(1) from sys_user u join sys_dept_user sdu on u.user_id = sdu.dept_id
+        where u.del_flag = '0' and sdu.dept_id = #{deptId}
+    </select>
+
+    <select id="hasChildByDeptId" parameterType="Long" resultType="int">
+        select count(1) from sys_dept
+        where del_flag = '0' and parent_id = #{deptId}
+    </select>
+
+    <select id="selectChildrenDeptById" parameterType="Long" resultMap="SysDeptResult" databaseId="mysql">
+        select * from sys_dept where find_in_set(#{deptId}, ancestors)
+    </select>
+
+    <select id="selectChildrenDeptById" parameterType="Long" resultMap="SysDeptResult" databaseId="sqlserver">
+        select * from sys_dept where charindex(concat(',', #{deptId}, ','), concat(',', ancestors, ',')) > 0
+    </select>
+
+    <select id="selectNormalChildrenDeptById" parameterType="Long" resultType="int" databaseId="mysql">
+        select count(*) from sys_dept where status = 0 and del_flag = '0' and find_in_set(#{deptId}, ancestors)
+    </select>
+
+    <select id="selectNormalChildrenDeptById" parameterType="Long" resultType="int" databaseId="sqlserver">
+        select count(*) from sys_dept where status = 0 and del_flag = '0' and charindex(concat(',', #{deptId}, ','), concat(',', ancestors, ',')) > 0
+    </select>
+
+    <select id="checkDeptNameUnique" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        where dept_name=#{deptName} and parent_id = #{parentId} and del_flag = '0'
+    </select>
+
+    <select id="selectDeptsByUserName" parameterType="String" resultMap="SysDeptResult">
+        select d.dept_id, d.dept_name, d.dept_code
+        from sys_dept d
+        left join sys_dept_user up on up.dept_id = d.dept_id
+        left join sys_user u on u.user_id = up.user_id
+        where u.user_name = #{userName}
+    </select>
+
+    <insert id="insertDept" parameterType="SysDept" databaseId="mysql">
+        insert into sys_dept(
+        <if test="deptId != null and deptId != 0">dept_id,</if>
+        <if test="parentId != null and parentId != 0">parent_id,</if>
+        <if test="deptCode != null and deptCode != ''">dept_code,</if>
+        <if test="deptName != null and deptName != ''">dept_name,</if>
+        <if test="ancestors != null and ancestors != ''">ancestors,</if>
+        <if test="orderNum != null and orderNum != ''">order_num,</if>
+        <if test="leader != null and leader != ''">leader,</if>
+        <if test="phone != null and phone != ''">phone,</if>
+        <if test="email != null and email != ''">email,</if>
+        <if test="status != null">status,</if>
+        <choose>
+            <when test="orgType != null">org_type,</when>
+            <otherwise>org_type,</otherwise>
+        </choose>
+        <choose>
+            <when test="divisionCode != null and divisionCode != ''">division_code,</when>
+            <otherwise>division_code,</otherwise>
+        </choose>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values(
+        <if test="deptId != null and deptId != 0">#{deptId},</if>
+        <if test="parentId != null and parentId != 0">#{parentId},</if>
+        <if test="deptCode != null and deptCode != ''">#{deptCode},</if>
+        <if test="deptName != null and deptName != ''">#{deptName},</if>
+        <if test="ancestors != null and ancestors != ''">#{ancestors},</if>
+        <if test="orderNum != null and orderNum != ''">#{orderNum},</if>
+        <if test="leader != null and leader != ''">#{leader},</if>
+        <if test="phone != null and phone != ''">#{phone},</if>
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="status != null">#{status},</if>
+        <choose>
+            <when test="orgType != null">#{orgType},</when>
+            <otherwise>IFNULL((select dict_value from sys_dict_data where dict_label = #{orgName}),"-1"),</otherwise>
+        </choose>
+        <choose>
+            <when test="divisionCode != null and divisionCode != ''">#{divisionCode},</when>
+            <otherwise>IFNULL((select division_code from sys_division where division_name = #{divisionName}),null ),</otherwise>
+        </choose>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <insert id="insertDept" parameterType="SysDept" databaseId="sqlserver">
+        insert into sys_dept(
+        <if test="deptId != null and deptId != 0">dept_id,</if>
+        <if test="parentId != null and parentId != 0">parent_id,</if>
+        <if test="deptCode != null and deptCode != ''">dept_code,</if>
+        <if test="deptName != null and deptName != ''">dept_name,</if>
+        <if test="ancestors != null and ancestors != ''">ancestors,</if>
+        <if test="orderNum != null and orderNum != ''">order_num,</if>
+        <if test="leader != null and leader != ''">leader,</if>
+        <if test="phone != null and phone != ''">phone,</if>
+        <if test="email != null and email != ''">email,</if>
+        <if test="status != null">status,</if>
+        <choose>
+            <when test="orgType != null">org_type,</when>
+            <otherwise>org_type,</otherwise>
+        </choose>
+        <choose>
+            <when test="divisionCode != null and divisionCode != ''">division_code,</when>
+            <otherwise>division_code,</otherwise>
+        </choose>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values(
+        <if test="deptId != null and deptId != 0">#{deptId},</if>
+        <if test="parentId != null and parentId != 0">#{parentId},</if>
+        <if test="deptCode != null and deptCode != ''">#{deptCode},</if>
+        <if test="deptName != null and deptName != ''">#{deptName},</if>
+        <if test="ancestors != null and ancestors != ''">#{ancestors},</if>
+        <if test="orderNum != null and orderNum != ''">#{orderNum},</if>
+        <if test="leader != null and leader != ''">#{leader},</if>
+        <if test="phone != null and phone != ''">#{phone},</if>
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="status != null">#{status},</if>
+        <choose>
+            <when test="orgType != null">#{orgType},</when>
+            <otherwise>isnull((select dict_value from sys_dict_data where dict_label = #{orgName}),"-1"),</otherwise>
+        </choose>
+        <choose>
+            <when test="divisionCode != null and divisionCode != ''">#{divisionCode},</when>
+            <otherwise>isnull((select division_code from sys_division where division_name = #{divisionName}),null ),</otherwise>
+        </choose>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        getdate()
+        )
+    </insert>
+
+    <update id="updateDept" parameterType="SysDept" databaseId="mysql">
+        update sys_dept
+        <set>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="deptName != null and deptName != ''">dept_name = #{deptName},</if>
+            <if test="ancestors != null and ancestors != ''">ancestors = #{ancestors},</if>
+            <if test="deptCode != null and deptCode != ''">dept_code=#{deptCode},</if>
+            <if test="orderNum != null and orderNum != ''">order_num = #{orderNum},</if>
+            <if test="leader != null">leader = #{leader},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <choose>
+                <when test="orgType != null">org_type = #{orgType},</when>
+                <otherwise>org_type = IFNULL((select dict_value from sys_dict_data where dict_label = #{orgName}),"-1"),</otherwise>
+            </choose>
+            <choose>
+                <when test="divisionCode != '' and divisionCode != null">division_code = #{divisionCode},</when>
+                <otherwise>division_code = IFNULL((select division_code from sys_division where division_name = #{divisionName}),null ),</otherwise>
+            </choose>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where dept_id = #{deptId}
+    </update>
+
+    <update id="updateDept" parameterType="SysDept" databaseId="sqlserver">
+        update sys_dept
+        <set>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="deptName != null and deptName != ''">dept_name = #{deptName},</if>
+            <if test="ancestors != null and ancestors != ''">ancestors = #{ancestors},</if>
+            <if test="deptCode != null and deptCode != ''">dept_code=#{deptCode},</if>
+            <if test="orderNum != null and orderNum != ''">order_num = #{orderNum},</if>
+            <if test="leader != null">leader = #{leader},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <choose>
+                <when test="orgType != null">org_type = #{orgType},</when>
+                <otherwise>org_type = isnull((select dict_value from sys_dict_data where dict_label = #{orgName}),"-1"),</otherwise>
+            </choose>
+            <choose>
+                <when test="divisionCode != '' and divisionCode != null">division_code = #{divisionCode},</when>
+                <otherwise>division_code = isnull((select division_code from sys_division where division_name = #{divisionName}),null ),</otherwise>
+            </choose>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = getdate()
+        </set>
+        where dept_id = #{deptId}
+    </update>
+
+    <update id="updateDeptChildren" parameterType="java.util.List">
+        update sys_dept set ancestors =
+        <foreach collection="depts" item="item" index="index"
+                 separator=" " open="case dept_id" close="end">
+            when #{item.deptId} then #{item.ancestors}
+        </foreach>
+        where dept_id in
+        <foreach collection="depts" item="item" index="index"
+                 separator="," open="(" close=")">
+            #{item.deptId}
+        </foreach>
+    </update>
+
+    <update id="updateDeptStatusNormal" parameterType="Long">
+        update sys_dept set status = '0' where dept_id in
+        <foreach collection="array" item="deptId" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </update>
+
+    <delete id="deleteDeptById" parameterType="Long">
+        update sys_dept set del_flag = '2' where dept_id = #{deptId}
+    </delete>
+
+    <select id="getFirstSubDept" parameterType="SysDept" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        where d.del_flag = '0'
+        <if test="deptId != null">
+            AND dept_id = #{deptId}
+        </if>
+        <if test="parentId != null">
+            AND parent_id = #{parentId}
+        </if>
+        <if test="deptName != null and deptName != ''">
+            AND dept_name like concat('%', #{deptName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="params!=null and params.orgTypes !=null and params.orgTypes.size()>0">
+            and org_type in
+            <foreach collection="params.orgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        order by d.parent_id, d.order_num
+    </select>
+
+    <select id="getDeptInfoByUserId" parameterType="Long" resultMap="SysDeptResult">
+        select t1.* from sys_user t
+        join sys_dept t1 on t.dept_id = t1.dept_id where t1.status = 0 and t1.del_flag = '0' and t.user_id = #{userId}
+    </select>
+
+    <select id="getAllSubDept" parameterType="Long" resultMap="SysDeptResult" databaseId="mysql">
+        select * from sys_dept where status = 0 and del_flag = '0' and find_in_set(#{deptId}, ancestors) or dept_id = #{deptId}
+    </select>
+
+    <select id="getAllSubDept" parameterType="Long" resultMap="SysDeptResult" databaseId="sqlserver">
+        select * from sys_dept where status = 0 and del_flag = '0' and charindex(concat(',', #{deptId}, ','), concat(',', ancestors, ',')) > 0 or dept_id = #{deptId}
+    </select>
+
+<!--    <select id="isParentContainFilter" parameterType="Map" resultMap="SysDeptResult">-->
+<!--        select * from sys_dept where 1=1-->
+<!--        <where>-->
+<!--            <if test="deptIdList != null and deptIdList.size > 0">-->
+<!--                dept_id in-->
+<!--                <foreach collection="deptIdList" index="index" item="item" open="(" separator="," close=")">-->
+<!--                    #{item,jdbcType=BIGINT}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="deptName != null and deptName != ''">-->
+<!--                AND dept_name LIKE concat('%',#{deptName},'%')-->
+<!--            </if>-->
+<!--        </where>-->
+
+<!--    </select>-->
+    <select id="isParentContainFilter" parameterType="SysDept" resultMap="SysDeptResult">
+        select t.* from sys_dept t  join (
+        SELECT
+        substring_index( substring_index( a.ancestors, ',', b.help_topic_id ), ',',- 1 ) parent_id
+        FROM sys_dept a JOIN sys_help b ON b.help_topic_id &lt;= (length( a.ancestors ) - length( REPLACE ( a.ancestors, ',', '' ) ) + 1 )
+        where a.dept_id = #{deptId}
+        ORDER BY a.dept_id) t1
+        on t.dept_id = t1.parent_id and t.dept_name LIKE concat('%',#{deptName},'%')
+    </select>
+
+    <select id="sonContainFilterByDeptTab" parameterType="SysDept" resultMap="SysDeptResult" databaseId="mysql">
+        select t.* from sys_dept t JOIN (
+        SELECT
+        group_concat(ancestors) concat
+        FROM
+        (SELECT ancestors FROM	sys_dept
+        WHERE STATUS = 0 AND del_flag = '0' AND find_in_set( #{deptId}, ancestors ) AND dept_name LIKE concat( '%', #{deptName}, '%' )
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        UNION
+        SELECT dept_id ancestors FROM sys_dept
+        WHERE STATUS = 0  AND del_flag = '0' AND parent_id = #{deptId} AND dept_name LIKE concat( '%', #{deptName}, '%' )
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        )t
+        ) t1 on find_in_set(t.dept_id, t1.concat)
+        where t.parent_id =#{deptId}
+    </select>
+
+    <select id="sonContainFilterByDeptTab" parameterType="SysDept" resultMap="SysDeptResult" databaseId="sqlserver">
+        select t.* from sys_dept t JOIN (
+            SELECT
+                group_concat(ancestors) concat
+            FROM
+                (SELECT ancestors FROM	sys_dept
+                WHERE STATUS = 0 AND del_flag = '0' AND charindex(concat(',', #{deptId}, ','), concat(',', ancestors, ',')) > 0 AND dept_name LIKE concat( '%', #{deptName}, '%' )
+                <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+                    and org_type not in
+                    <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                UNION
+                SELECT dept_id ancestors FROM sys_dept
+                WHERE STATUS = 0  AND del_flag = '0' AND parent_id = #{deptId} AND dept_name LIKE concat( '%', #{deptName}, '%' )
+                <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+                    and org_type not in
+                    <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                )t
+        ) t1 on charindex(concat(',', t.dept_id, ','), concat(',', t1.concat, ',')) > 0
+        where t.parent_id =#{deptId}
+    </select>
+
+    <select id="sonContainFilterByUserTab" parameterType="SysDept" resultMap="SysDeptResult" databaseId="mysql">
+        select t.* from sys_dept t JOIN (
+        SELECT
+        group_concat(ancestors) concat
+        FROM
+        (SELECT t.ancestors FROM sys_dept t left join
+        sys_user t1 on t.dept_id = t1.dept_id and t1.STATUS = 0	AND t1.del_flag = '0'
+        WHERE t.STATUS = 0 AND t.del_flag = '0' AND find_in_set( #{deptId}, t.ancestors ) AND
+            (t.dept_name LIKE concat( '%', #{deptName}, '%' ) or t1.user_name LIKE concat('%',#{deptName},'%') or t1.nick_name LIKE concat('%',#{deptName},'%'))
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and t.org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        UNION
+        SELECT t.dept_id ancestors FROM sys_dept t left join
+        sys_user t1 on t.dept_id = t1.dept_id and t1.STATUS = 0	AND t1.del_flag = '0'
+        WHERE t.STATUS = 0  AND t.del_flag = '0' AND t.parent_id = #{deptId} AND
+            (t.dept_name LIKE concat( '%', #{deptName}, '%' ) or t1.user_name LIKE concat('%',#{deptName},'%') or t1.nick_name LIKE concat('%',#{deptName},'%'))
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and t.org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        )t
+        ) t1 on find_in_set(t.dept_id, t1.concat)
+        where t.parent_id =#{deptId}
+    </select>
+
+    <select id="sonContainFilterByUserTab" parameterType="SysDept" resultMap="SysDeptResult" databaseId="sqlserver">
+        select t.* from sys_dept t JOIN (
+        SELECT
+        group_concat(ancestors) concat
+        FROM
+        (SELECT t.ancestors FROM sys_dept t left join
+        sys_user t1 on t.dept_id = t1.dept_id and t1.STATUS = 0	AND t1.del_flag = '0'
+        WHERE t.STATUS = 0 AND t.del_flag = '0' AND charindex(concat(',', #{deptId}, ','), concat(',', t.ancestors, ',')) > 0 AND
+        (t.dept_name LIKE concat( '%', #{deptName}, '%' ) or t1.user_name LIKE concat('%',#{deptName},'%') or t1.nick_name LIKE concat('%',#{deptName},'%'))
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and t.org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        UNION
+        SELECT t.dept_id ancestors FROM sys_dept t left join
+        sys_user t1 on t.dept_id = t1.dept_id and t1.STATUS = 0	AND t1.del_flag = '0'
+        WHERE t.STATUS = 0  AND t.del_flag = '0' AND t.parent_id = #{deptId} AND
+        (t.dept_name LIKE concat( '%', #{deptName}, '%' ) or t1.user_name LIKE concat('%',#{deptName},'%') or t1.nick_name LIKE concat('%',#{deptName},'%'))
+        <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+            and t.org_type not in
+            <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        )t
+        ) t1 on charindex(concat(',', t.dept_id, ','), concat(',', t1.concat, ',')) > 0
+        where t.parent_id =#{deptId}
+    </select>
+    <select id="getMoreDeptInfoByUserId" parameterType="long" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        join sys_dept_user du on d.dept_id = du.dept_id
+        where du.user_id = #{userId}
+        and d.STATUS = 0 AND d.del_flag = '0'
+    </select>
+    <select id="getDeptInfoByDeptCodes" parameterType="java.util.List" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        WHERE d.del_flag =0
+        and d.dept_code in
+        <foreach collection="deptCodes" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDeptInfoByDeptIds" parameterType="java.util.List" resultMap="SysDeptResult">
+        <include refid="selectDeptVo"/>
+        WHERE d.del_flag =0
+        and d.dept_id in
+        <foreach collection="deptIds" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDeptsWithUserCount" parameterType="SysDept" resultType="com.soflyit.system.api.domain.vo.SysDeptWithUserCountVo">
+        SELECT
+            d.dept_id as deptId,
+            d.dept_name as deptName,
+            d.parent_id as parentId,
+            du.userCount as userCount
+        FROM
+            sys_dept d
+            LEFT JOIN ( SELECT dept_id, COUNT( dept_id ) AS userCount FROM `sys_dept_user` GROUP BY dept_id ) du ON d.dept_id = du.dept_id
+        <where>
+            d.del_flag != 2
+            <if test="deptId != null and deptId != 0">
+                AND d.dept_id = #{deptId}
+            </if>
+            <if test="parentId != null and parentId != 0">
+                AND d.parent_id = #{parentId}
+            </if>
+            <if test="deptCode != null and deptCode != ''">
+                AND d.dept_code = #{deptCode}
+            </if>
+            <if test="orgType != null">
+                AND d.org_type = #{orgType}
+            </if>
+            <if test="deptName != null and deptName != ''">
+                AND d.dept_name like concat('%', #{deptName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND d.status = #{status}
+            </if>
+            <if test="params!=null and params.orgTypes !=null and params.orgTypes.size()>0">
+                and d.org_type in
+                <foreach collection="params.orgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="params!=null and params.exceptOrgTypes !=null and params.exceptOrgTypes.size()>0">
+                and d.org_type not in
+                <foreach collection="params.exceptOrgTypes" item="item" open="(" close=")" index="idx" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

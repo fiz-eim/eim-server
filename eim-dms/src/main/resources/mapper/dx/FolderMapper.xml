@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.dx.modular.folder.organization.mapper.FolderMapper">
+    <select id="getFoldersByParentFolder"
+            resultType="com.soflyit.chattask.dx.modular.folder.organization.domain.entity.FolderEntity">
+        <!--  WITH RECURSIVE subfolders AS (
+              SELECT *
+              FROM dx_folder
+              WHERE FOLDER_ID = #{folderId}
+                and DELETE_FLAG = 2
+              UNION ALL
+              SELECT r.*
+              FROM dx_folder r
+                       INNER JOIN subfolders s ON r.FOLDER_PARENT_ID = s.folder_id and r.DELETE_FLAG = 2
+          )
+          SELECT *
+          FROM subfolders where FOLDER_ID  !=  #{folderId};-->
+        SELECT au.*
+        FROM (SELECT * FROM dx_folder WHERE FOLDER_PARENT_ID IS NOT NULL) au,
+             (SELECT @pid := #{folderId}) pd
+        WHERE FIND_IN_SET(FOLDER_PARENT_ID, @pid) > 0
+                  AND @pid := concat(@pid, ',', FOLDER_ID)
+    </select>
+</mapper>

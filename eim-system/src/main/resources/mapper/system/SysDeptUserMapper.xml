@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.system.mapper.SysDeptUserMapper">
+
+    <resultMap type="SysDeptUser" id="SysDeptUserResult">
+        <result property="id" column="id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap type="com.soflyit.system.api.domain.SysUser" id="SysUserResult">
+        <id property="userId" column="user_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+    </resultMap>
+    <sql id="selectSysDeptUserVo">
+        select id, dept_id, user_id, create_by, create_time, update_by, update_time
+        from sys_dept_user
+    </sql>
+
+    <select id="selectSysDeptUserList" parameterType="SysDeptUser" resultMap="SysDeptUserResult">
+        <include refid="selectSysDeptUserVo"/>
+        <where>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+        </where>
+    </select>
+
+    <select id="selectSysDeptUserById" parameterType="Long" resultMap="SysDeptUserResult">
+        <include refid="selectSysDeptUserVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectDeptUsersByUserId" resultMap="SysDeptUserResult">
+        select id, sdu.dept_id, user_id, sdu.create_by, sdu.create_time, sdu.update_by, sdu.update_time
+        from sys_dept_user sdu
+        left join sys_dept d on d.dept_id = sdu.dept_id
+        where user_id = #{userId} and d.status = '0'
+    </select>
+
+    <insert id="insertSysDeptUser" parameterType="SysDeptUser" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_dept_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysDeptUser" parameterType="SysDeptUser">
+        update sys_dept_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysDeptUserById" parameterType="Long">
+        delete from sys_dept_user where id = #{id}
+    </delete>
+
+    <delete id="deleteSysDeptUserByIds" parameterType="String">
+        delete from sys_dept_user where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteSysDeptUserByUserId" parameterType="long">
+        delete from sys_dept_user where user_id = #{userId}
+    </delete>
+
+
+    <insert id="batchDeptUser">
+        insert into sys_dept_user(user_id,dept_id,create_time,create_by) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.userId},#{item.deptId},#{item.createTime},#{item.createBy})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByDeptIdUserId" parameterType="SysDeptUser">
+        delete
+        from sys_dept_user
+        where dept_id = #{deptId}
+          and user_id = #{userId}
+    </delete>
+    <select id="selectUserListByDeptIdList" resultMap="SysUserResult">
+        SELECT
+        u.user_name,u.nick_name ,u.dept_id
+        FROM
+        sys_dept_user sdu
+        LEFT JOIN sys_user u ON u.user_id = sdu.user_id
+        WHERE
+        sdu.dept_id IN
+        <foreach collection="deptIdList" item="deptId" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+        and u.del_flag = '0'
+    </select>
+</mapper>

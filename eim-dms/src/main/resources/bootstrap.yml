@@ -1,0 +1,12 @@
+server:
+  port: 9601
+
+spring:
+  application:
+    name: eim-dms
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+

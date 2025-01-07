@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgPinnedMapper">
+
+    <resultMap type="MsgPinned" id="MsgPinnedResult">
+        <result property="id" column="id"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectMsgPinnedVo">
+        select id, channel_id, user_id, msg_id, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME from msg_pinned
+    </sql>
+
+    <select id="selectMsgPinnedList" parameterType="MsgPinned" resultMap="MsgPinnedResult">
+        <include refid="selectMsgPinnedVo"/>
+        <where>
+            <if test="channelId != null "> and channel_id = #{channelId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectMsgPinnedById" parameterType="Long" resultMap="MsgPinnedResult">
+        <include refid="selectMsgPinnedVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMsgPinned" parameterType="MsgPinned">
+        insert into msg_pinned
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="channelId != null">channel_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="msgId != null">msg_id,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="channelId != null">#{channelId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="msgId != null">#{msgId},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMsgPinned" parameterType="MsgPinned">
+        update msg_pinned
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="msgId != null">msg_id = #{msgId},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMsgPinnedById" parameterType="Long">
+        delete from msg_pinned where id = #{id}
+    </delete>
+
+    <delete id="deleteMsgPinnedByIds" parameterType="String">
+        delete from msg_pinned where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

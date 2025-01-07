@@ -1,0 +1,225 @@
+services:
+  minio:
+    image: "${IMAGE_PREFIX}minio/minio:RELEASE.2024-01-16T16-07-38Z"
+    container_name: minio
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.10
+    ports:
+      - "7010:7010"
+      - "7011:7011"
+    volumes:
+      - "${EIM_BASE_DIR}/application/minio/data:/data"
+      - "${EIM_BASE_DIR}/application/minio/data2:/data2"
+    command: server /data --address ":7010" --console-address ":7011"
+    environment:
+      - MINIO_ROOT_USER=${EIM_MINIO_USER}
+      - MINIO_ROOT_PASSWORD=${EIM_MINIO_PWD}
+
+  redis:
+    image: ${IMAGE_PREFIX}redis:6.2.6
+    container_name: redis
+    restart: always
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.11
+    volumes:
+      - ${EIM_BASE_DIR}/application/redis/data:/data
+      - ${EIM_BASE_DIR}/application/redis/conf/redis.conf:/etc/redis/redis.conf
+      - ${EIM_BASE_DIR}/application/redis/logs:/logs
+    command: redis-server /etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+  mysql:
+    restart: always
+    privileged: true
+    image: ${IMAGE_PREFIX}mysql:8.0
+    container_name: mysql
+    volumes:
+      - ${EIM_BASE_DIR}/application/mysql/db:/var/lib/mysql
+      - ${EIM_BASE_DIR}/application/mysql/conf/custom.cnf:/etc/mysql/conf.d/custom.cnf
+      - ${EIM_BASE_DIR}/application/mysql/logs:/logs
+      - ./mysql/init/:/docker-entrypoint-initdb.d/
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower-case-table-names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: "${EIM_MYSQL_ROOT_PWD}"
+      MYSQL_USER: "${EIM_DB_USER}"
+      MYSQL_PASSWORD: "${EIM_DB_PWD}"
+      MYSQL_INITDB_SKIP_TZINFO: "Asia/Shanghai"
+    ports:
+      - "3306:3306"
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.12
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 3s
+      retries: 6
+  nacos:
+    image: ${IMAGE_PREFIX}nacos/nacos-server:v2.3.2
+    container_name: nacos
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.13
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      PREFER_HOST_MODE: hostname
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MODE: standalone
+      MYSQL_SERVICE_HOST: ${SUBNET_PREFIX}.12
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: nacos
+      NACOS_APPLICATION_PORT: 8848
+      JVM_XMS: 512m
+      JVM_MMS: 320m
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      NACOS_AUTH_IDENTITY_KEY: c2VydmVySWRlbnRpdHktNTFzZXJ2ZXJJZGVudGl0eS01MXNlcnZlcklkZW50aXR5LTUx
+      NACOS_AUTH_IDENTITY_VALUE: c2VjdXJpdHktNTFzZWN1cml0eS01MXNlY3VyaXR5LTUxc2VjdXJpdHktNTFzZWN1cml0eS01MXNlY3VyaXR5LTUxc2VjdXJpdHktNTFzZWN1cml0eS01MXNlY3VyaXR5LTUx
+      NACOS_AUTH_TOKEN: c29mbHlOYWNvc0NoYXRAMjAyMzExMDFzb2ZseU5hY29zQ2hhdEBzb2ZseU5hY29zQ2hhdEAyMDIzMTEwMTIwMjMxMTAx
+      NACOS_USER: nacos
+      NACOS_PASSWORD: nacos
+      NACOS_AUTH_ENABLE: true
+    volumes:
+      - ${EIM_BASE_DIR}/application/nacos/standalone-logs/:/home/nacos/logs
+      - ${EIM_BASE_DIR}/application/nacos/plugins/:/home/nacos/plugins
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+  sofly-avatar:
+    image: ${IMAGE_PREFIX}soflyit/avatar:1.2
+    container_name: sofly-avatar
+    ports:
+      - "9150:3000"
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.26
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    image: ${IMAGE_PREFIX}nginx:1.26.1
+    network_mode: host
+    volumes:
+      - ${EIM_BASE_DIR}/application/nginx/conf.d:/etc/nginx/conf.d
+      - ${EIM_BASE_DIR}/application/nginx/log:/var/log/nginx
+      - ${EIM_BASE_DIR}/application/nginx/front:/data/application/front:Z
+
+  eim-gateway:
+    image: "${IMAGE_PREFIX}soflyit/jdk-common-8:1.0"
+    container_name: eim-gateway
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.2
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAR_NAME: eim-gateway.jar
+    ports:
+      - "8080:8080"
+    volumes:
+      - "../gateway:/work"
+    depends_on:
+      nacos:
+        condition: service_healthy
+  eim-auth:
+    image: "${IMAGE_PREFIX}soflyit/jdk-common-8:1.0"
+    container_name: eim-auth
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.3
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAR_NAME: eim-auth.jar
+    ports:
+      - "9200:9200"
+    volumes:
+      - "../auth:/work"
+    depends_on:
+      nacos:
+        condition: service_healthy
+      eim-gateway:
+        condition: service_started
+      eim-system:
+        condition: service_started
+  eim-system:
+    image: "${IMAGE_PREFIX}soflyit/jdk-common-8:1.0"
+    container_name: eim-system
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.4
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAR_NAME: eim-system.jar
+    ports:
+      - "9201:9201"
+    volumes:
+      - "../system:/work"
+    depends_on:
+      nacos:
+        condition: service_healthy
+      eim-gateway:
+        condition: service_started
+  eim-im:
+    image: "${IMAGE_PREFIX}soflyit/jdk-common-8:1.0"
+    container_name: eim-im
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.5
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAR_NAME: eim-im.jar
+    restart: unless-stopped
+    ports:
+      - "9602:9602"
+      - "9603:9603"
+    volumes:
+      - "../eim:/work"
+    depends_on:
+      nacos:
+        condition: service_healthy
+      eim-gateway:
+        condition: service_started
+  eim-dms:
+    image: "${IMAGE_PREFIX}soflyit/jdk-common-8:1.0"
+    container_name: eim-dms
+    networks:
+      eim-net:
+        ipv4_address: ${SUBNET_PREFIX}.6
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAR_NAME: eim-dms.jar
+    restart: unless-stopped
+    ports:
+      - "9601:9601"
+    volumes:
+      - "../dms:/work"
+    depends_on:
+      nacos:
+        condition: service_healthy
+      eim-gateway:
+        condition: service_started
+networks:
+  eim-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: ${SUBNET_PREFIX:?SUBNET_PREFIX required}.0/24
+
+

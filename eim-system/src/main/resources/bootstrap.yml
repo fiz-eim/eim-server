@@ -1,0 +1,13 @@
+server:
+  port: 9201
+
+spring:
+  application:
+    name: eim-system
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+eim-eim:
+  version: eim-eim-version

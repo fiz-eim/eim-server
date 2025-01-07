@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.soflyit.cloud.open</groupId>
+        <artifactId>eim-server</artifactId>
+        <version>${eim-cloud.version}${eim-cloud.changelist}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>eim-im</artifactId>
+    <description>eim-im</description>
+    <packaging>pom</packaging>
+    <modules>
+        <module>im-lib</module>
+        <module>im-server</module>
+    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.soflyit.cloud.open</groupId>
+                <artifactId>eim-im-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.soflyit.cloud.open</groupId>
+                <artifactId>im-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+</project>

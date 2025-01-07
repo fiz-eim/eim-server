@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.soflyit.cloud.open</groupId>
+        <artifactId>eim-server</artifactId>
+        <version>${eim-cloud.version}${eim-cloud.changelist}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>eim-system</artifactId>
+
+    <description>
+        eim-system系统模块
+    </description>
+
+    <properties>
+        <sofly.project.name>system</sofly.project.name>
+    </properties>
+
+    <dependencies>
+
+        <!-- SpringCloud Alibaba Nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- SpringCloud Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- SpringCloud Alibaba Sentinel -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- SpringBoot Actuator 监控监控-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+
+        <!-- Mysql Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+
+        <!-- Industry Common DataSource -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-datasource</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+                    <groupId>com.alibaba.cloud</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Industry Common DataScope -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-datascope</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-auth</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Industry Common Swagger -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-swagger</artifactId>
+        </dependency>
+        <!-- SpringBoot Websocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-system-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>eim-common-core</artifactId>
+                    <groupId>com.soflyit.cloud.open</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- 文件存储 -->
+        <dependency>
+            <groupId>com.soflyit.cloud.open</groupId>
+            <artifactId>eim-common-minio</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>${project.name.prefix}-${sofly.project.name}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-config</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/dist/config</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                    <excludes>
+                                        <exclude>mapper/**</exclude>
+                                        <exclude>*.txt</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>*.xml</exclude>
+                        <exclude>*.yml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <replace file ="${basedir}/target/dist/config/bootstrap.yml" token="eim-eim-version" value="${project.version}"></replace>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>copy-lib-src</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/dist/lib"></mkdir>
+                                <copy todir="${project.build.directory}/dist/">
+                                    <fileset dir="${project.build.directory}/">
+                                        <include name="*.jar"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/classes">
+                                    <fileset dir="${project.build.directory}/dist/config">
+                                        <include name="*.xml"/>
+                                        <include name="*.yml"/>
+                                    </fileset>
+                                </copy>
+                                <zip destfile="${project.build.directory}/${project.build.finalName}.zip">
+                                    <zipfileset dir="${project.build.directory}/dist"/>
+                                </zip>
+<!--                                <delete file="${project.build.directory}/${project.build.finalName}.jar"/>-->
+                                <delete dir="${project.build.directory}/dist"  includeemptydirs="true"/>
+                                <delete dir="${project.build.directory}/bin"  includeemptydirs="true"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+        </plugins>
+    </build>
+
+</project>

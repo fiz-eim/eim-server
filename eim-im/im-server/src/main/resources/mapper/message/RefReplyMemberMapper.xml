@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.RefReplyMemberMapper">
+
+    <resultMap type="RefReplyMember" id="RefReplyMemberResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="unreadCount" column="unread_count"/>
+        <result property="mentionCount" column="mention_count"/>
+        <result property="urgentMentionCount" column="urgent_mention_count"/>
+        <result property="followFlag" column="follow_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectRefReplyMemberVo">
+        select id, msg_id, user_id, unread_count, mention_count, urgent_mention_count, follow_flag, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME from ref_reply_member
+    </sql>
+
+    <select id="selectRefReplyMemberList" parameterType="RefReplyMember" resultMap="RefReplyMemberResult">
+        <include refid="selectRefReplyMemberVo"/>
+        <where>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="unreadCount != null "> and unread_count = #{unreadCount}</if>
+            <if test="mentionCount != null "> and mention_count = #{mentionCount}</if>
+            <if test="urgentMentionCount != null "> and urgent_mention_count = #{urgentMentionCount}</if>
+            <if test="followFlag != null "> and follow_flag = #{followFlag}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectRefReplyMemberById" parameterType="Long" resultMap="RefReplyMemberResult">
+        <include refid="selectRefReplyMemberVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertRefReplyMember" parameterType="RefReplyMember" useGeneratedKeys="true" keyProperty="id">
+        insert into ref_reply_member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">msg_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="unreadCount != null">unread_count,</if>
+            <if test="mentionCount != null">mention_count,</if>
+            <if test="urgentMentionCount != null">urgent_mention_count,</if>
+            <if test="followFlag != null">follow_flag,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">#{msgId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="unreadCount != null">#{unreadCount},</if>
+            <if test="mentionCount != null">#{mentionCount},</if>
+            <if test="urgentMentionCount != null">#{urgentMentionCount},</if>
+            <if test="followFlag != null">#{followFlag},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRefReplyMember" parameterType="RefReplyMember">
+        update ref_reply_member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="msgId != null">msg_id = #{msgId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="unreadCount != null">unread_count = #{unreadCount},</if>
+            <if test="mentionCount != null">mention_count = #{mentionCount},</if>
+            <if test="urgentMentionCount != null">urgent_mention_count = #{urgentMentionCount},</if>
+            <if test="followFlag != null">follow_flag = #{followFlag},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRefReplyMemberById" parameterType="Long">
+        delete from ref_reply_member where id = #{id}
+    </delete>
+
+    <delete id="deleteRefReplyMemberByIds" parameterType="String">
+        delete from ref_reply_member where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

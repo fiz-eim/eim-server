@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soflyit.chattask.im.message.mapper.MsgStatisticMapper">
+
+    <resultMap type="MsgStatistic" id="MsgStatisticResult">
+        <result property="msgId" column="msg_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="unreadCount" column="unread_count"/>
+        <result property="unAckCount" column="unack_count"/>
+        <result property="remark" column="remark"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="revision" column="REVISION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectMsgStatisticVo">
+        select msg_id, user_id, unread_count, unack_count, remark, TENANT_ID, REVISION, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME from msg_statistic
+    </sql>
+
+    <select id="selectMsgStatisticList" parameterType="MsgStatistic" resultMap="MsgStatisticResult">
+        <include refid="selectMsgStatisticVo"/>
+        <where>
+            <if test="msgId != null "> and msg_id = #{msgId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="unreadCount != null "> and unread_count = #{unreadCount}</if>
+            <if test="unAckCount != null "> and unack_count = #{unackCount}</if>
+            <if test="tenantId != null "> and TENANT_ID = #{tenantId}</if>
+            <if test="revision != null "> and REVISION = #{revision}</if>
+            <if test="createBy != null "> and CREATE_BY = #{createBy}</if>
+            <if test="createTime != null "> and CREATE_TIME = #{createTime}</if>
+            <if test="updateBy != null "> and UPDATE_BY = #{updateBy}</if>
+            <if test="updateTime != null "> and UPDATE_TIME = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectMsgStatisticByMsgId" parameterType="Long" resultMap="MsgStatisticResult">
+        <include refid="selectMsgStatisticVo"/>
+        where msg_id = #{msgId}
+    </select>
+
+    <insert id="insertMsgStatistic" parameterType="MsgStatistic" useGeneratedKeys="true" keyProperty="msgId">
+        insert into msg_statistic
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">msg_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="unreadCount != null">unread_count,</if>
+            <if test="unAckCount != null">unack_count,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="tenantId != null">TENANT_ID,</if>
+            <if test="revision != null">REVISION,</if>
+            <if test="createBy != null">CREATE_BY,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+            <if test="updateBy != null">UPDATE_BY,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="msgId != null ">#{msgId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="unreadCount != null">#{unreadCount},</if>
+            <if test="unAckCount != null">#{unAckCount},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="revision != null">#{revision},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMsgStatistic" parameterType="MsgStatistic">
+        update msg_statistic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="unreadCount != null">unread_count = #{unreadCount},</if>
+            <if test="unAckCount != null">unack_count = #{unAckCount},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="tenantId != null">TENANT_ID = #{tenantId},</if>
+            <if test="revision != null">REVISION = #{revision},</if>
+            <if test="createBy != null">CREATE_BY = #{createBy},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where msg_id = #{msgId}
+    </update>
+
+    <delete id="deleteMsgStatisticByMsgId" parameterType="Long">
+        delete from msg_statistic where msg_id = #{msgId}
+    </delete>
+
+    <delete id="deleteMsgStatisticByMsgIds" parameterType="String">
+        delete from msg_statistic where msg_id in
+        <foreach item="msgId" collection="array" open="(" separator="," close=")">
+            #{msgId}
+        </foreach>
+    </delete>
+</mapper>

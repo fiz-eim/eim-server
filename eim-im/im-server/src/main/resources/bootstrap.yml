@@ -1,0 +1,13 @@
+server:
+  port: 9602
+
+spring:
+  application:
+    name: eim-im
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+eim-eim:
+  version: eim-eim-version
