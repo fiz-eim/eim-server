@@ -2,6 +2,7 @@ package com.soflyit.gateway.config;
 
 import com.google.code.kaptcha.text.impl.DefaultTextCreator;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 /**
@@ -15,7 +16,7 @@ public class KaptchaTextCreator extends DefaultTextCreator {
     @Override
     public String getText() {
         Integer result = 0;
-        Random random = new Random();
+        Random random = new SecureRandom();
         int x = random.nextInt(10);
         int y = random.nextInt(10);
         StringBuilder suChinese = new StringBuilder();
