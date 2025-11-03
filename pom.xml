@@ -60,7 +60,7 @@
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <milo.version>0.6.5</milo.version>
         <minio.version>8.2.2</minio.version>
-        <mssql-jdbc.version>8.2.2.jre8</mssql-jdbc.version>
+        <mssql-jdbc.version>10.2.4.jre8</mssql-jdbc.version>
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <mybatis-plus-datasource.version>3.4.1</mybatis-plus-datasource.version>
         <ojdbc6-jdbc.version>11.2.0.4</ojdbc6-jdbc.version>
